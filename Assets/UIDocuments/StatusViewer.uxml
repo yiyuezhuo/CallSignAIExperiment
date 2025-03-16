@@ -1,0 +1,52 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column;">
+        <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <engine:Label text="X:" />
+            <engine:Label text="X">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="currentX" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Y:" />
+            <engine:Label text="Y">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="currentY" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Current Side:" />
+            <engine:Label text="currentSide">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="gameState.currentSide" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Initial:" />
+            <engine:Label text="turnInitialSide">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="gameState.turnInitialSide" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Phase:" />
+            <engine:Label text="currentPhase">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="gameState.currentPhase" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Victory Status:" />
+            <engine:Label text="victoryStatus">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="gameState.victoryStatus" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+            <engine:Label text="Victory Side:" />
+            <engine:Label text="victorySide">
+                <Bindings>
+                    <engine:DataBinding property="text" data-source-path="gameState.victorySide" binding-mode="ToTarget" />
+                </Bindings>
+            </engine:Label>
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <engine:Button text="Next Phase" name="NextPhaseButton" />
+            <engine:Button text="Button" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
