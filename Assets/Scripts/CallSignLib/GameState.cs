@@ -176,7 +176,7 @@ public class EvadingDeclare : IGameAction
     public override string ToString()
     {
         var ds = string.Join(",", records);
-        return $"MoveAction({ds})";
+        return $"EvadingDeclare({ds})";
     }
 }
 
@@ -425,14 +425,13 @@ public class GameState
         foreach(var piece in piecesOnMap)
         {
             var hex = GetHex(piece);
-            if(!piece.isTanker)
+            
+            var minSupplyDist =  fuelSourceMap[piece.side].Select(fh => fh.Distance(hex)).Min();
+            var validFuelSourceCount = fuelSourceMap[piece.side].Where(fh => fh.Distance(hex) <= piece.fuelRange).Count();
+            if(minSupplyDist > piece.fuelRange)
             {
-                var validFuelSourceCount = fuelSourceMap[piece.side].Where(fh => fh.Distance(hex) <= piece.fuelRange).Count();
-                if(validFuelSourceCount == 0)
-                {
-                    destroyedSet.Add(piece);
-                    Log($"Piece {piece.name} is out of fuel range, self-destruction");
-                }
+                destroyedSet.Add(piece);
+                Log($"Piece {piece.name} is out of fuel range ({minSupplyDist} > {piece.fuelRange}), self-destruction");
             }
         }
 

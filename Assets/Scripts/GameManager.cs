@@ -3,7 +3,8 @@ using UnityEngine.EventSystems;
 using Unity.Properties;
 using CallSignLib;
 using System.Collections.Generic;
-using UnityEngine.AI;
+// using UnityEngine.AI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,7 +20,12 @@ public class GameManager : MonoBehaviour
     public Transform blueDestroyedTransform;
     public Transform pieceViewersTransform;
 
+    public Transform labelsTransform;
+    public GameObject labelPrefab;
+
     public GameObject piecePrefab;
+
+    public bool showLabels;
 
     public RandomAgent randomAgent = new();
 
@@ -47,6 +53,14 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateStackLocations();
+
+        foreach(((var x, var y), var hex) in GameState.grid.hexMap)
+        {
+            var worldPos = GameXYToWorldPos(x, y);
+            var newLabel = Instantiate(labelPrefab, worldPos, Quaternion.Euler(0, 0, 0), labelsTransform);
+            var text = newLabel.GetComponent<TMP_Text>();
+            text.text = $"({x}, {y})";
+        }
     }
 
     public void UpdateStackLocations()
@@ -126,6 +140,8 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"mousePos={mousePos}, gridPos={gridPos}, gameXY={gameXY}");
             }
         }
+
+        labelsTransform.gameObject.SetActive(showLabels);
     }
 
     public Vector2Int GridPosToGameXY(Vector3Int gridPos)

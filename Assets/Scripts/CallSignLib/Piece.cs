@@ -1,3 +1,5 @@
+using System;
+
 namespace CallSignLib
 {
 
@@ -14,6 +16,7 @@ public enum MapState
     Destroyed
 }
 
+[Serializable]
 public class Piece
 {
     public int id;
@@ -64,7 +67,7 @@ public class Piece
             antiShipRating = 5,
             antiAirRange = 1,
             antiShipRange = 2,
-            fuelRange = 2,
+            fuelRange = int.MaxValue,
         };
     }
 
@@ -74,7 +77,8 @@ public class Piece
         {
             name = name,
             side = side,
-            isTanker=true
+            isTanker=true,
+            fuelRange = int.MaxValue,
         };
     }
 
@@ -84,7 +88,8 @@ public class Piece
         {
             name = name,
             side = side,
-            isC2=true
+            isC2=true,
+            fuelRange = 2,
         };
     }
 
@@ -94,7 +99,8 @@ public class Piece
         {
             name = name,
             side = side,
-            isJammer=true
+            isJammer=true,
+            fuelRange = 2,
         };
     }
 }

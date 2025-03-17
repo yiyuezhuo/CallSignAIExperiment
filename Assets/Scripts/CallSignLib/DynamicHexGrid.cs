@@ -10,12 +10,14 @@ public class DynamicHexGrid
         (1, 4), (2,4), (3,4), (5,4)
     };
 
-    static List<(int, int)> oddOffsets = new()
+    // static List<(int, int)> oddOffsets = new()
+    static List<(int, int)> evenOffsets = new()
     {
         (0, -1), (1, -1), (1, 0), (0, 1), (-1, 0), (-1, -1) 
     };
 
-    static List<(int, int)> evenOffsets = new()
+    // static List<(int, int)> evenOffsets = new()
+    static List<(int, int)> oddOffsets = new()
     {
         (0, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)
     };

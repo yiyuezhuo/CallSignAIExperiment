@@ -46,7 +46,13 @@
         </engine:VisualElement>
         <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
             <engine:Button text="Next Phase" name="NextPhaseButton" />
-            <engine:Button text="Button" />
+            <engine:Button text="Show Current Action" name="ShowCurrentActionButton" />
+            <engine:Button text="Show Current State" name="ShowCurrentStateButton" />
+            <engine:Toggle label="Show Labels">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="showLabels" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:Toggle>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
