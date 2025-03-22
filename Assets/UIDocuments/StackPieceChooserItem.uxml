@@ -1,0 +1,5 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="PieceItem" style="flex-grow: 0; width: 50px; height: 50px;">
+        <engine:VisualElement name="Icon" style="flex-grow: 1; background-image: resource(&apos;PieceTexture/C1&apos;); -unity-background-scale-mode: scale-to-fit; border-top-width: 1px; border-left-width: 1px; border-bottom-width: 1px; border-right-width: 1px;" />
+    </engine:VisualElement>
+</engine:UXML>

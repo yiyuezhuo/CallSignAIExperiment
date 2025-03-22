@@ -5,6 +5,8 @@ using CallSignLib;
 using System.Collections.Generic;
 // using UnityEngine.AI;
 using TMPro;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class GameManager : MonoBehaviour
     public GameState gameState = GameState.Setup();
     public int currentX;
     public int currentY;
+
+    [DoNotSerialize]
+    public Piece currentPiece = null;
 
     public Transform redNotDeployedTransform;
     public Transform redDestroyedTransform;
@@ -63,8 +68,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateStackLocations()
+    public Dictionary<(StackType, int, int), List<Piece>> CollectStackKeyToPieces()
     {
+        // (StackType, x, y) => Piece
         var stackKeyToPieces = new Dictionary<(StackType, int, int), List<Piece>>();
         foreach(var piece in gameState.pieces)
         {
@@ -91,6 +97,12 @@ public class GameManager : MonoBehaviour
             }
             stack.Add(piece);
         }
+        return stackKeyToPieces;
+    }
+
+    public void UpdateStackLocations()
+    {
+        var stackKeyToPieces = CollectStackKeyToPieces();
         
         foreach(((var stackType, var gameX, var gameY), var stack) in stackKeyToPieces)
         {
@@ -120,6 +132,8 @@ public class GameManager : MonoBehaviour
         InitialSetup();
 
         GameState.logged += (sender, message) => Debug.Log(message);
+
+        currentPiece = null;
     }
 
     // Update is called once per frame
@@ -138,10 +152,50 @@ public class GameManager : MonoBehaviour
             {
                 // Handle left-click
                 Debug.Log($"mousePos={mousePos}, gridPos={gridPos}, gameXY={gameXY}");
+
+                // var ray = Camera.main.ScreenPointToRay(mousePos);
+                Vector2 mousePos2 = mousePos;
+                var hit = Physics2D.Raycast(mousePos2, Vector2.zero);
+                if(hit.collider != null)
+                {
+                    var pieceViewer = hit.collider.GetComponent<PieceViewer>();
+                    if(pieceViewer != null)
+                    {
+                        // clicked on piece
+                        Debug.Log($"Clicked on Piece: {pieceViewer}");
+
+                        currentPiece = pieceViewer.currentPiece;
+
+                        var stackKeyToPieces = CollectStackKeyToPieces();
+                        (var selectedStackKey, var selectedStack) = stackKeyToPieces.First(p => p.Value.Contains(pieceViewer.currentPiece));
+
+                        OnStackClicked(selectedStack);
+                    }
+                }
+                // Handle Hex Clicked? (Supprress unit/stack selection sometimes)
+            }
+
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                currentPiece = null;
             }
         }
 
         labelsTransform.gameObject.SetActive(showLabels);
+    }
+
+    public void OnStackClicked(List<Piece> pieces)
+    {
+        Debug.Log(string.Format("Clicked on stack: {0}", string.Join(",", pieces.Select(p => p.name))));
+
+        StackPieceChooser.Instance.SyncWithStack(pieces);
+    }
+
+    public void OnPieceClicked(Piece piece)
+    {
+        Debug.Log($"OnPieceClicked: {piece.name}");
+
+        currentPiece = piece;
     }
 
     public Vector2Int GridPosToGameXY(Vector3Int gridPos)

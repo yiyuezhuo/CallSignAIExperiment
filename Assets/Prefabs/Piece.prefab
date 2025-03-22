@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 4066116502046045651}
   - component: {fileID: 8650739628574693002}
   - component: {fileID: 6383516710572535260}
+  - component: {fileID: -4958849884055469710}
   m_Layer: 0
-  m_Name: C1_0
+  m_Name: Piece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,3 +101,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dbbd1c5861915f43be68cbd26896bb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentPiece:
+    id: 0
+    name: 
+    side: 0
+    mapState: 0
+    x: 0
+    y: 0
+    antiAirRating: 0
+    antiShipRating: 0
+    antiAirRange: 0
+    antiShipRange: 0
+    specialRange: 0
+    fuelRange: 0
+    isJammer: 0
+    isC2: 0
+    isTanker: 0
+--- !u!61 &-4958849884055469710
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6160733504739974718}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.22, y: 2.16}
+    newSize: {x: 2.22, y: 2.16}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2.22, y: 2.16}
+  m_EdgeRadius: 0

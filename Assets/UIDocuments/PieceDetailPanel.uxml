@@ -1,0 +1,17 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" name="PieceDetailPanel" data-source-path="currentPiece" style="flex-grow: 0; width: 150px;">
+        <engine:VisualElement style="flex-grow: 1; width: auto; height: 100px; background-image: resource(&apos;PieceTexture/C1&apos;); -unity-background-scale-mode: scale-to-fit;">
+            <Bindings>
+                <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="Piece to StyleBackground" />
+            </Bindings>
+        </engine:VisualElement>
+        <engine:Label text="Piece Name" style="-unity-text-align: upper-center;">
+            <Bindings>
+                <engine:DataBinding property="text" data-source-path="name" binding-mode="ToTarget" />
+            </Bindings>
+        </engine:Label>
+        <Bindings>
+            <engine:DataBinding property="style.display" binding-mode="ToTarget" source-to-ui-converters="Piece to DisplayStyle" />
+        </Bindings>
+    </engine:VisualElement>
+</engine:UXML>

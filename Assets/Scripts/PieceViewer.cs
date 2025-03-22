@@ -1,4 +1,5 @@
 using CallSignLib;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PieceViewer: MonoBehaviour
@@ -17,7 +18,7 @@ public class PieceViewer: MonoBehaviour
         
     }
 
-    public string GetTextureName()
+    public static string GetTextureName(Piece currentPiece)
     {
         var sideSym = currentPiece.side switch
         {
@@ -52,9 +53,14 @@ public class PieceViewer: MonoBehaviour
         return sym;
     }
 
+    public static Sprite GetSprite(Piece currentPiece)
+    {
+        return Resources.Load<Sprite>(GetTextureName(currentPiece));
+    }
+
     public void SyncTexture()
     {
-        spriteRenderer.sprite = Resources.Load<Sprite>(GetTextureName());
+        spriteRenderer.sprite = GetSprite(currentPiece);
         
     }
 

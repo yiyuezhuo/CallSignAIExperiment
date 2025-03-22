@@ -1,5 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column;">
+    <engine:Template name="StackPieceChooser" src="project://database/Assets/UIDocuments/StackPieceChooser.uxml?fileID=9197481963319205126&amp;guid=bdeeaf8d4be703a4ba1c5df741c30048&amp;type=3#StackPieceChooser" />
+    <engine:Template name="PieceDetailPanel" src="project://database/Assets/UIDocuments/PieceDetailPanel.uxml?fileID=9197481963319205126&amp;guid=efe12d13ab3d7d64285558ad2804332b&amp;type=3#PieceDetailPanel" />
+    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column; right: 150px; left: 0; position: absolute; border-right-width: 5px;">
         <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
             <engine:Label text="X:" />
             <engine:Label text="X">
@@ -54,5 +56,9 @@
                 </Bindings>
             </engine:Toggle>
         </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement style="flex-grow: 1; position: absolute; right: 0; width: 150px; background-color: rgba(255, 255, 255, 0.49);">
+        <engine:Instance template="StackPieceChooser" />
+        <engine:Instance template="PieceDetailPanel" />
     </engine:VisualElement>
 </engine:UXML>
