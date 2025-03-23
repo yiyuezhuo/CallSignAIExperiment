@@ -1,0 +1,34 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UIDocuments/style.uss?fileID=7433441132597879392&amp;guid=6422005a05230b54e8d612fd23d7f712&amp;type=3#style" />
+    <engine:VisualElement data-source-type="CallSignLib.EngagmentDeclare+EngagementRecord, Assembly-CSharp" class="compact" style="flex-grow: 0; flex-direction: column; width: 100%; height: 60px;">
+        <engine:VisualElement style="flex-grow: 0; position: absolute;">
+            <engine:VisualElement style="flex-grow: 0; background-image: resource(&apos;PieceTexture/R3&apos;); -unity-background-scale-mode: scale-to-fit; height: 40px; background-position-x: left 0;">
+                <Bindings>
+                    <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="EngagementRecord =&gt; shooter image" />
+                </Bindings>
+            </engine:VisualElement>
+            <engine:Label text="Shooter" style="width: 49%;">
+                <Bindings>
+                    <engine:DataBinding property="text" binding-mode="ToTarget" source-to-ui-converters="EngagmentDeclare.EngagementRecord =&gt; shooter Name" />
+                </Bindings>
+            </engine:Label>
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-grow: 0; position: absolute; right: 0; bottom: 0; flex-direction: column-reverse;">
+            <engine:VisualElement style="flex-grow: 1; -unity-background-scale-mode: scale-to-fit; background-image: resource(&apos;PieceTexture/C4&apos;); height: 40px; background-position-x: right 0; flex-direction: column; width: 40px;">
+                <Bindings>
+                    <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="EngagementRecord =&gt; target image" />
+                </Bindings>
+            </engine:VisualElement>
+            <engine:Label text="Target" style="width: 49%; -unity-text-align: upper-right; right: 0; flex-grow: 0; position: absolute; top: auto; bottom: 40px;">
+                <Bindings>
+                    <engine:DataBinding property="text" binding-mode="ToTarget" source-to-ui-converters="EngagmentDeclare.EngagementRecord =&gt; target Name" />
+                </Bindings>
+            </engine:Label>
+        </engine:VisualElement>
+        <engine:Toggle tooltip="True if attack aircraft, false if attack carrier" style="position: absolute; top: 50%; left: 50%; translate: -50% -50%;">
+            <Bindings>
+                <engine:DataBinding property="value" data-source-path="type" source-to-ui-converters="EngagmentDeclare.EngagementType =&gt; bool" ui-to-source-converters="bool =&gt; EngagmentDeclare.EngagementType" binding-mode="TwoWay" />
+            </Bindings>
+        </engine:Toggle>
+    </engine:VisualElement>
+</engine:UXML>

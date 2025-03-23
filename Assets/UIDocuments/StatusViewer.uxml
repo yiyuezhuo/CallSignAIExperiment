@@ -1,8 +1,64 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <engine:Template name="StackPieceChooser" src="project://database/Assets/UIDocuments/StackPieceChooser.uxml?fileID=9197481963319205126&amp;guid=bdeeaf8d4be703a4ba1c5df741c30048&amp;type=3#StackPieceChooser" />
     <engine:Template name="PieceDetailPanel" src="project://database/Assets/UIDocuments/PieceDetailPanel.uxml?fileID=9197481963319205126&amp;guid=efe12d13ab3d7d64285558ad2804332b&amp;type=3#PieceDetailPanel" />
-    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column; right: 150px; left: 0; position: absolute; border-right-width: 5px;">
+    <Style src="project://database/Assets/UIDocuments/style.uss?fileID=7433441132597879392&amp;guid=6422005a05230b54e8d612fd23d7f712&amp;type=3#style" />
+    <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column; right: 200px; left: 0; position: absolute; border-right-width: 5px; margin-right: 2px;">
+        <engine:VisualElement class="compact" style="flex-grow: 0; flex-direction: row;">
+            <engine:Label text="Current:" />
+            <engine:EnumField value="Center" type="CallSignLib.Side, Assembly-CSharp">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="gameState.currentSide" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:EnumField>
+            <engine:Label text="Initial:" />
+            <engine:EnumField value="Center" type="CallSignLib.Side, Assembly-CSharp">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="gameState.turnInitialSide" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:EnumField>
+            <engine:Label text="Phase:" />
+            <engine:EnumField value="Center" type="CallSignLib.GameState+Phase, Assembly-CSharp">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="gameState.currentPhase" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:EnumField>
+            <engine:Label text="Victory Status:" />
+            <engine:EnumField value="Center" type="CallSignLib.GameState+VictoryStatus, Assembly-CSharp">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="gameState.victoryStatus" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:EnumField>
+            <engine:Label text="Victory Side:">
+                <Bindings>
+                    <engine:DataBinding property="style.display" data-source-path="gameState.victoryStatus" binding-mode="ToTarget" source-to-ui-converters="Victory Status =&gt; DisplayStyle" />
+                </Bindings>
+            </engine:Label>
+            <engine:EnumField value="Center" type="CallSignLib.Side, Assembly-CSharp">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="gameState.victorySide" binding-mode="TwoWay" />
+                    <engine:DataBinding property="style.display" data-source-path="gameState.victoryStatus" binding-mode="ToTarget" source-to-ui-converters="Victory Status =&gt; DisplayStyle" />
+                </Bindings>
+            </engine:EnumField>
+        </engine:VisualElement>
         <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <engine:Button text="AI Run &amp; Next Phase" name="AIRunAndNextPhaseButton" />
+            <engine:Button text="End Edit &amp; Next Phase" name="EndEditAndNextPhaseButton" />
+            <engine:Button text="Show Current Action" name="ShowCurrentActionButton" />
+            <engine:Button text="Show Current State" name="ShowCurrentStateButton" />
+            <engine:Toggle label="Show Labels">
+                <Bindings>
+                    <engine:DataBinding property="value" data-source-path="showLabels" binding-mode="TwoWay" />
+                </Bindings>
+            </engine:Toggle>
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement style="flex-grow: 1; position: absolute; right: 0; width: 200px; background-color: rgba(255, 255, 255, 0.2); max-height: 100%; height: 100%;">
+        <engine:Instance template="StackPieceChooser" style="flex-shrink: 0;" />
+        <engine:Instance template="PieceDetailPanel" style="border-top-width: 2px; flex-shrink: 0;" />
+        <engine:ListView name="EngagementRecordListView" header-title="Engagement Records" show-foldout-header="false" binding-source-selection-mode="AutoAssign" item-template="project://database/Assets/UIDocuments/EngagementRecordListViewItem.uxml?fileID=9197481963319205126&amp;guid=7d317fecbe49c3740b2f8fe6b4633a96&amp;type=3#EngagementRecordListViewItem" virtualization-method="DynamicHeight" show-add-remove-footer="true" style="flex-shrink: 1; flex-grow: 0;" />
+    </engine:VisualElement>
+    <engine:VisualElement class="compact" style="flex-grow: 1; position: absolute; left: 0; bottom: 0; flex-direction: column-reverse; background-color: rgba(255, 255, 255, 0.2);">
+        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
             <engine:Label text="X:" />
             <engine:Label text="X">
                 <Bindings>
@@ -15,50 +71,11 @@
                     <engine:DataBinding property="text" data-source-path="currentY" binding-mode="ToTarget" />
                 </Bindings>
             </engine:Label>
-            <engine:Label text="Current Side:" />
-            <engine:Label text="currentSide">
-                <Bindings>
-                    <engine:DataBinding property="text" data-source-path="gameState.currentSide" binding-mode="ToTarget" />
-                </Bindings>
-            </engine:Label>
-            <engine:Label text="Initial:" />
-            <engine:Label text="turnInitialSide">
-                <Bindings>
-                    <engine:DataBinding property="text" data-source-path="gameState.turnInitialSide" binding-mode="ToTarget" />
-                </Bindings>
-            </engine:Label>
-            <engine:Label text="Phase:" />
-            <engine:Label text="currentPhase">
-                <Bindings>
-                    <engine:DataBinding property="text" data-source-path="gameState.currentPhase" binding-mode="ToTarget" />
-                </Bindings>
-            </engine:Label>
-            <engine:Label text="Victory Status:" />
-            <engine:Label text="victoryStatus">
-                <Bindings>
-                    <engine:DataBinding property="text" data-source-path="gameState.victoryStatus" binding-mode="ToTarget" />
-                </Bindings>
-            </engine:Label>
-            <engine:Label text="Victory Side:" />
-            <engine:Label text="victorySide">
-                <Bindings>
-                    <engine:DataBinding property="text" data-source-path="gameState.victorySide" binding-mode="ToTarget" />
-                </Bindings>
-            </engine:Label>
         </engine:VisualElement>
-        <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
-            <engine:Button text="Next Phase" name="NextPhaseButton" />
-            <engine:Button text="Show Current Action" name="ShowCurrentActionButton" />
-            <engine:Button text="Show Current State" name="ShowCurrentStateButton" />
-            <engine:Toggle label="Show Labels">
-                <Bindings>
-                    <engine:DataBinding property="value" data-source-path="showLabels" binding-mode="TwoWay" />
-                </Bindings>
-            </engine:Toggle>
-        </engine:VisualElement>
-    </engine:VisualElement>
-    <engine:VisualElement style="flex-grow: 1; position: absolute; right: 0; width: 150px; background-color: rgba(255, 255, 255, 0.49);">
-        <engine:Instance template="StackPieceChooser" />
-        <engine:Instance template="PieceDetailPanel" />
+        <engine:Label text="state">
+            <Bindings>
+                <engine:DataBinding property="text" data-source-path="state" data-source-type="GameManager, Assembly-CSharp" binding-mode="ToTarget" />
+            </Bindings>
+        </engine:Label>
     </engine:VisualElement>
 </engine:UXML>

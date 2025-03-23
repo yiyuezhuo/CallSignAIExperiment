@@ -125,6 +125,7 @@ public class EngagmentDeclare : IGameAction
         Carrier
     }
 
+    [Serializable]
     public class EngagementRecord
     {
         public EngagementType type;
@@ -180,7 +181,7 @@ public class EvadingDeclare : IGameAction
     }
 }
 
-
+[Serializable]
 public class GameState
 {
     public List<Piece> pieces;

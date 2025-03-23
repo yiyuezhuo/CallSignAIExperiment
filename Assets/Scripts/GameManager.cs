@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 using Unity.Properties;
 using CallSignLib;
 using System.Collections.Generic;
-// using UnityEngine.AI;
 using TMPro;
 using System.Linq;
 using Unity.VisualScripting;
@@ -23,6 +22,7 @@ public class GameManager : MonoBehaviour
     public Transform redDestroyedTransform;
     public Transform blueNotDeployedTransform;
     public Transform blueDestroyedTransform;
+
     public Transform pieceViewersTransform;
 
     public Transform labelsTransform;
@@ -43,7 +43,68 @@ public class GameManager : MonoBehaviour
         BlueRegenerated
     }
 
+    public enum State
+    {
+        Idle, // Select a unit and use edit command
+        EditMoveBegin // Select a hex to move to.
+    }
+
+    public State state;
+
     public Dictionary<Piece, PieceViewer> pieceToViewer = new();
+
+    public LayerMask pieceLayer;
+    public LayerMask mapLayer;
+
+    public class RefAreaRecord
+    {
+        public MapState mapState;
+        public Side side;
+        public Transform transform;
+        public StackType stackType;
+    }
+
+    List<RefAreaRecord> refAreaRecords;
+
+    void Awake()
+    {
+        pieceLayer = LayerMask.GetMask("Piece"); // Can't be set in the declaration
+        mapLayer = LayerMask.GetMask("Map");
+
+        refAreaRecords = new()
+        {
+            new RefAreaRecord()
+            {
+                mapState = MapState.NotDeployed,
+                side = Side.Blue,
+                transform = blueNotDeployedTransform,
+                stackType = StackType.BlueNotDeployed
+            },
+            new RefAreaRecord()
+            {
+                mapState = MapState.NotDeployed,
+                side = Side.Red,
+                transform = redNotDeployedTransform,
+                stackType = StackType.RedNotDeployed
+            },
+            new RefAreaRecord()
+            {
+                mapState = MapState.Destroyed,
+                side = Side.Blue,
+                transform = blueDestroyedTransform,
+                stackType = StackType.BlueRegenerated
+            },
+            new RefAreaRecord()
+            {
+                mapState = MapState.Destroyed,
+                side = Side.Red,
+                transform = redDestroyedTransform,
+                stackType = StackType.RedRegenerated
+            }
+        };
+    }
+
+    // 
 
 
     public void InitialSetup()
@@ -74,15 +135,18 @@ public class GameManager : MonoBehaviour
         var stackKeyToPieces = new Dictionary<(StackType, int, int), List<Piece>>();
         foreach(var piece in gameState.pieces)
         {
-            // var pieceViewer = pieceToViewer[piece];
-            var stackType = (piece.mapState, piece.side) switch
-            {
-                (MapState.NotDeployed, Side.Red) => StackType.RedNotDeployed,
-                (MapState.NotDeployed, Side.Blue) => StackType.BlueNotDeployed,
-                (MapState.Destroyed, Side.Red) => StackType.RedRegenerated,
-                (MapState.Destroyed, Side.Blue) => StackType.BlueRegenerated,
-                _ => StackType.Map
-            };
+            // var stackType = (piece.mapState, piece.side) switch
+            // {
+            //     (MapState.NotDeployed, Side.Red) => StackType.RedNotDeployed,
+            //     (MapState.NotDeployed, Side.Blue) => StackType.BlueNotDeployed,
+            //     (MapState.Destroyed, Side.Red) => StackType.RedRegenerated,
+            //     (MapState.Destroyed, Side.Blue) => StackType.BlueRegenerated,
+            //     _ => StackType.Map
+            // };
+
+            var refRecord = refAreaRecords.FirstOrDefault(r => r.mapState == piece.mapState && r.side == piece.side);
+            var stackType = refRecord != null ? refRecord.stackType : StackType.Map; 
+
             var x = -1;
             var y = -1;
             if(stackType == StackType.Map)
@@ -111,14 +175,17 @@ public class GameManager : MonoBehaviour
             {
                 var pieceViewer = pieceToViewer[piece];
 
-                var worldPos = stackType switch
-                {
-                    StackType.RedNotDeployed => redNotDeployedTransform.position,
-                    StackType.RedRegenerated => redDestroyedTransform.position,
-                    StackType.BlueNotDeployed => blueNotDeployedTransform.position,
-                    StackType.BlueRegenerated => blueDestroyedTransform.position,
-                    _ => GameXYToWorldPos(piece.x, piece.y)
-                };
+                // var worldPos = stackType switch
+                // {
+                //     StackType.RedNotDeployed => redNotDeployedTransform.position,
+                //     StackType.RedRegenerated => redDestroyedTransform.position,
+                //     StackType.BlueNotDeployed => blueNotDeployedTransform.position,
+                //     StackType.BlueRegenerated => blueDestroyedTransform.position,
+                //     _ => GameXYToWorldPos(piece.x, piece.y)
+                // };
+
+                var refRecord = refAreaRecords.FirstOrDefault(r => r.stackType == stackType);
+                var worldPos = refRecord != null ? refRecord.transform.position : GameXYToWorldPos(piece.x, piece.y);
 
                 pieceViewer.SetStackOffset(n, worldPos);
                 n++;
@@ -134,11 +201,30 @@ public class GameManager : MonoBehaviour
         GameState.logged += (sender, message) => Debug.Log(message);
 
         currentPiece = null;
+
+        DebugSetup();
+    }
+
+    void DebugSetup()
+    {
+        foreach(var piece in gameState.pieces)
+        {
+            piece.mapState = MapState.OnMap;
+            (piece.x, piece.y) = gameState.sideData[0].carrirCenter;
+        }
+
+        UpdateStackLocations();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            currentPiece = null;
+            state = State.Idle;
+        }
+
         if(!EventSystem.current.IsPointerOverGameObject())
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -148,39 +234,89 @@ public class GameManager : MonoBehaviour
             currentX = gameXY.x;
             currentY = gameXY.y;
 
-            if (Input.GetMouseButtonDown(0))
+            if(state == State.Idle)
             {
-                // Handle left-click
-                Debug.Log($"mousePos={mousePos}, gridPos={gridPos}, gameXY={gameXY}");
-
-                // var ray = Camera.main.ScreenPointToRay(mousePos);
-                Vector2 mousePos2 = mousePos;
-                var hit = Physics2D.Raycast(mousePos2, Vector2.zero);
-                if(hit.collider != null)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    var pieceViewer = hit.collider.GetComponent<PieceViewer>();
-                    if(pieceViewer != null)
+                    // Handle left-click
+                    // Debug.Log($"Idle: mousePos={mousePos}, gridPos={gridPos}, gameXY={gameXY}");
+
+                    // var ray = Camera.main.ScreenPointToRay(mousePos);
+                    Vector2 mousePos2 = mousePos;
+                    var hit = Physics2D.Raycast(mousePos2, Vector2.zero, Mathf.Infinity, pieceLayer);
+                    if(hit.collider != null)
                     {
-                        // clicked on piece
-                        Debug.Log($"Clicked on Piece: {pieceViewer}");
+                        var pieceViewer = hit.collider.GetComponent<PieceViewer>();
+                        if(pieceViewer != null)
+                        {
+                            // clicked on piece
+                            Debug.Log($"Clicked on Piece: {pieceViewer}");
 
-                        currentPiece = pieceViewer.currentPiece;
+                            currentPiece = pieceViewer.currentPiece;
 
-                        var stackKeyToPieces = CollectStackKeyToPieces();
-                        (var selectedStackKey, var selectedStack) = stackKeyToPieces.First(p => p.Value.Contains(pieceViewer.currentPiece));
+                            var stackKeyToPieces = CollectStackKeyToPieces();
+                            (var selectedStackKey, var selectedStack) = stackKeyToPieces.First(p => p.Value.Contains(pieceViewer.currentPiece));
 
-                        OnStackClicked(selectedStack);
+                            OnStackClicked(selectedStack);
+                        }
                     }
+                    // Handle Hex Clicked? (Supprress unit/stack selection sometimes)
                 }
-                // Handle Hex Clicked? (Supprress unit/stack selection sometimes)
-            }
 
-            if(Input.GetKeyDown(KeyCode.Escape))
+                if(Input.GetKeyDown(KeyCode.M) && currentPiece != null)
+                {
+                    state = State.EditMoveBegin;
+                }
+            }
+            else if(state == State.EditMoveBegin)
             {
-                currentPiece = null;
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Vector2 mousePos2 = mousePos;
+                    var hit = Physics2D.Raycast(mousePos2, Vector2.zero, Mathf.Infinity, mapLayer);
+                    if(hit.collider != null) // ref area
+                    {
+                        Debug.Log($"ref area={hit.collider}");
+                        if(currentPiece != null)
+                        {
+                            //
+                            // hit.collider.transform switch
+                            // {
+                            //     redNotDeployedTransform => (MapState.NotDeployed, Side.Red),
+                            //     blueNotDeployedTransform => (MapState.NotDeployed, Side.Blue),
+                            //     redRegeneratedTransform => (MapState.Destroyed, Side.Red),
+                            //     blueRegeneratedTransform =>(MapState.Destroyed, Side.Blue),
+                            // };
+                            var refRecord = refAreaRecords.FirstOrDefault(r => r.transform == hit.collider.transform);
+                            if(currentPiece.side == refRecord.side)
+                            {
+                                currentPiece.mapState = refRecord.mapState;
+                            }
+                            else
+                            {
+                                Debug.Log("It's not a valid move target");
+                            }
+                        }
+                    }
+                    else // hex
+                    {
+                        Debug.Log($"EditMoveBegin: mousePos={mousePos}, gridPos={gridPos}, gameXY={gameXY}");
+                        
+                        if(currentPiece != null)
+                        {
+                            currentPiece.mapState = MapState.OnMap;
+                            currentPiece.x = gameXY.x;
+                            currentPiece.y = gameXY.y;
+                        }
+                    }
+
+                    state = State.Idle;
+                    UpdateStackLocations();
+                }
             }
         }
 
+        // Sync
         labelsTransform.gameObject.SetActive(showLabels);
     }
 
@@ -217,6 +353,9 @@ public class GameManager : MonoBehaviour
     {
         return grid.CellToWorld(GameXYToGridPos(gameX, gameY));
     }
+
+    // [CreateProperty]
+    // public currentGameState
 
 
     public static GameManager _instance;

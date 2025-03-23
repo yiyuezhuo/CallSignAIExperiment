@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Mono.Cecil.Cil;
 using UnityEngine;
 using UnityEngine.UIElements;
 using CallSignLib;
@@ -15,6 +14,7 @@ public class StackPieceChooser: MonoBehaviour
     {
         var doc = GetComponent<UIDocument>();
         root = doc.rootVisualElement;
+
 
         stackPieceChooser = root.Q<VisualElement>("StackPieceChooser");
         SyncWithStack(new());
