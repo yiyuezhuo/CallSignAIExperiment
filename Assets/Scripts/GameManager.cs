@@ -46,7 +46,9 @@ public class GameManager : MonoBehaviour
     public enum State
     {
         Idle, // Select a unit and use edit command
-        EditMoveBegin // Select a hex to move to.
+        EditMoveBegin, // Select a hex to move to.
+        SelectShooter,
+        SelectTarget
     }
 
     public State state;
@@ -65,6 +67,9 @@ public class GameManager : MonoBehaviour
     }
 
     List<RefAreaRecord> refAreaRecords;
+
+    public int currentEditEngagementId;
+    public Side playingSide;
 
     void Awake()
     {
@@ -202,7 +207,7 @@ public class GameManager : MonoBehaviour
 
         currentPiece = null;
 
-        DebugSetup();
+        // DebugSetup();
     }
 
     void DebugSetup()
@@ -234,7 +239,8 @@ public class GameManager : MonoBehaviour
             currentX = gameXY.x;
             currentY = gameXY.y;
 
-            if(state == State.Idle)
+            // if(state == State.Idle)
+            if(state != State.EditMoveBegin)
             {
                 if (Input.GetMouseButtonDown(0))
                 {

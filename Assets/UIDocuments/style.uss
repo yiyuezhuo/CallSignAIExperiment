@@ -13,3 +13,10 @@
 .compact .unity-enum-field__text {
     margin-right: 5px;
 }
+
+.compact .unity-enum-field__input {
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-left: 1px;
+    margin-right: 1px;
+}

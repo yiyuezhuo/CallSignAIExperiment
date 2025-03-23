@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/UIDocuments/style.uss?fileID=7433441132597879392&amp;guid=6422005a05230b54e8d612fd23d7f712&amp;type=3#style" />
     <engine:VisualElement data-source-type="CallSignLib.EngagmentDeclare+EngagementRecord, Assembly-CSharp" class="compact" style="flex-grow: 0; flex-direction: column; width: 100%; height: 60px;">
         <engine:VisualElement style="flex-grow: 0; position: absolute;">
-            <engine:VisualElement style="flex-grow: 0; background-image: resource(&apos;PieceTexture/R3&apos;); -unity-background-scale-mode: scale-to-fit; height: 40px; background-position-x: left 0;">
+            <engine:VisualElement name="ShooterIcon" style="flex-grow: 0; background-image: resource(&apos;PieceTexture/R3&apos;); -unity-background-scale-mode: scale-to-fit; height: 40px; background-position-x: left 0; width: 40px; background-color: rgba(255, 255, 255, 0.2);">
                 <Bindings>
                     <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="EngagementRecord =&gt; shooter image" />
                 </Bindings>
@@ -13,13 +13,13 @@
                 </Bindings>
             </engine:Label>
         </engine:VisualElement>
-        <engine:VisualElement style="flex-grow: 0; position: absolute; right: 0; bottom: 0; flex-direction: column-reverse;">
-            <engine:VisualElement style="flex-grow: 1; -unity-background-scale-mode: scale-to-fit; background-image: resource(&apos;PieceTexture/C4&apos;); height: 40px; background-position-x: right 0; flex-direction: column; width: 40px;">
+        <engine:VisualElement style="flex-grow: 0; position: absolute; right: 0; bottom: 0; flex-direction: column-reverse; align-items: flex-end;">
+            <engine:VisualElement name="TargetIcon" style="flex-grow: 0; -unity-background-scale-mode: scale-to-fit; background-image: resource(&apos;PieceTexture/C4&apos;); height: 40px; background-position-x: right 0; flex-direction: column; width: 40px; background-color: rgba(255, 255, 255, 0.2);">
                 <Bindings>
                     <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="EngagementRecord =&gt; target image" />
                 </Bindings>
             </engine:VisualElement>
-            <engine:Label text="Target" style="width: 49%; -unity-text-align: upper-right; right: 0; flex-grow: 0; position: absolute; top: auto; bottom: 40px;">
+            <engine:Label text="Target" style="width: 49%; -unity-text-align: upper-right; flex-grow: 0; position: relative;">
                 <Bindings>
                     <engine:DataBinding property="text" binding-mode="ToTarget" source-to-ui-converters="EngagmentDeclare.EngagementRecord =&gt; target Name" />
                 </Bindings>

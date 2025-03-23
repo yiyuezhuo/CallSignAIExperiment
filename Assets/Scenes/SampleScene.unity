@@ -1525,6 +1525,8 @@ MonoBehaviour:
   mapLayer:
     serializedVersion: 2
     m_Bits: 0
+  currentEditEngagementId: 0
+  playingSide: 0
 --- !u!4 &1203390762
 Transform:
   m_ObjectHideFlags: 0

@@ -91,6 +91,16 @@ public static class RegisteredConverters
         });
         ConverterGroups.RegisterConverterGroup(group);
 
+        group = new ConverterGroup("GameManager.State => bool (Commitable)");
+        group.AddConverter((ref GameManager.State s) => {
+            return s switch
+            {
+                GameManager.State.SelectShooter => true,
+                GameManager.State.SelectTarget => true,
+                _ => false
+            };
+        });
+        ConverterGroups.RegisterConverterGroup(group);
     }
 
     static string GetNameFromPieceId(int id)

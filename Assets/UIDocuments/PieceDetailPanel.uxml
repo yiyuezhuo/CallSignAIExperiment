@@ -1,17 +1,26 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UIDocuments/style.uss?fileID=7433441132597879392&amp;guid=6422005a05230b54e8d612fd23d7f712&amp;type=3#style" />
     <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" name="PieceDetailPanel" data-source-path="currentPiece" class="compact" style="flex-grow: 0; width: 100%; flex-shrink: 0;">
-        <engine:VisualElement style="flex-grow: 1; width: auto; height: 75px; background-image: resource(&apos;PieceTexture/C1&apos;); -unity-background-scale-mode: scale-to-fit;">
-            <Bindings>
-                <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="Piece to StyleBackground" />
-            </Bindings>
+        <engine:VisualElement style="flex-grow: 0; flex-direction: row;">
+            <engine:VisualElement style="flex-grow: 1; width: 85px; height: 85px; background-image: resource(&apos;PieceTexture/C1&apos;); -unity-background-scale-mode: scale-to-fit;">
+                <Bindings>
+                    <engine:DataBinding property="style.backgroundImage" binding-mode="ToTarget" source-to-ui-converters="Piece to StyleBackground" />
+                </Bindings>
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-grow: 1;">
+                <engine:Button text="Edit Move (M)" name="EditMoveButton" style="-unity-text-align: middle-center;" />
+                <engine:Button text="Commit (C)" name="CommitButton">
+                    <Bindings>
+                        <engine:DataBinding property="enabledSelf" data-source-path="state" data-source-type="GameManager, Assembly-CSharp" binding-mode="ToTarget" source-to-ui-converters="GameManager.State =&gt; bool (Commitable)" />
+                    </Bindings>
+                </engine:Button>
+            </engine:VisualElement>
         </engine:VisualElement>
         <engine:Label text="Piece Name" style="-unity-text-align: upper-center;">
             <Bindings>
                 <engine:DataBinding property="text" data-source-path="name" binding-mode="ToTarget" />
             </Bindings>
         </engine:Label>
-        <engine:Button text="Edit Move (M)" name="EditMoveButton" style="-unity-text-align: middle-center;" />
         <Bindings>
             <engine:DataBinding property="style.display" binding-mode="ToTarget" source-to-ui-converters="Piece to DisplayStyle" />
         </Bindings>
