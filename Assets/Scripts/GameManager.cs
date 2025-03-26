@@ -169,6 +169,32 @@ public class GameManager : MonoBehaviour
         return stackKeyToPieces;
     }
 
+    public void DoCommitUnit()
+    {
+        if(!(state == State.SelectShooter || state == State.SelectTarget))
+        {
+            return;
+        }
+
+        var decs = gameState.engagementDeclares;
+        var recId = currentEditEngagementId;
+
+        if(recId >= 0 && recId < decs.Count && currentPiece != null)
+        {
+            var valueId = currentPiece.id;
+            if(state == State.SelectShooter)
+            {
+                decs[recId].shooterPieceId = valueId;
+            }
+            else if(state == State.SelectTarget)
+            {
+                decs[recId].targetPieceId = valueId;
+            }
+        }
+        
+        state = State.Idle;
+    }
+
     public void UpdateStackLocations()
     {
         var stackKeyToPieces = CollectStackKeyToPieces();
@@ -228,6 +254,10 @@ public class GameManager : MonoBehaviour
         {
             currentPiece = null;
             state = State.Idle;
+        }
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            DoCommitUnit();
         }
 
         if(!EventSystem.current.IsPointerOverGameObject())

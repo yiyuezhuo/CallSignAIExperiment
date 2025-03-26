@@ -137,23 +137,7 @@ public class StatusViewer : MonoBehaviour
 
         var gmr = GameManager.Instance;
 
-        var decs = gmr.gameState.engagementDeclares;
-        var recId = gmr.currentEditEngagementId;
-
-        if(recId >= 0 && recId < decs.Count && gmr.currentPiece != null)
-        {
-            var valueId = gmr.currentPiece.id;
-            if(gmr.state == GameManager.State.SelectShooter)
-            {
-                decs[recId].shooterPieceId = valueId;
-            }
-            else if(gmr.state == GameManager.State.SelectTarget)
-            {
-                decs[recId].targetPieceId = valueId;
-            }
-        }
-        
-        gmr.state = GameManager.State.Idle;
+        gmr.DoCommitUnit();
     }
 
     public void EnsureSpeedRecordCreated(IEnumerable<int> index)
