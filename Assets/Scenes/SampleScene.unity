@@ -1493,22 +1493,6 @@ MonoBehaviour:
     victorySide: 0
   currentX: 0
   currentY: 0
-  currentPiece:
-    id: 0
-    name: 
-    side: 0
-    mapState: 0
-    x: 0
-    y: 0
-    antiAirRating: 0
-    antiShipRating: 0
-    antiAirRange: 0
-    antiShipRange: 0
-    specialRange: 0
-    fuelRange: 0
-    isJammer: 0
-    isC2: 0
-    isTanker: 0
   redNotDeployedTransform: {fileID: 1979641237}
   redDestroyedTransform: {fileID: 555231318}
   blueNotDeployedTransform: {fileID: 1265604293}
@@ -1517,6 +1501,7 @@ MonoBehaviour:
   labelsTransform: {fileID: 852433580}
   labelPrefab: {fileID: 1824745843666500049, guid: 42c73b67ee0fdbc4ba11e6bdc809dfa3, type: 3}
   piecePrefab: {fileID: 6160733504739974718, guid: 2ca0ae52e244d2949833e5b3429eef26, type: 3}
+  damageTokenPrefab: {fileID: 6160733504739974718, guid: 240da142dee55b94491ee5421eae2246, type: 3}
   showLabels: 0
   state: 0
   pieceLayer:

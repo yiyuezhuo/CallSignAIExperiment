@@ -26,25 +26,34 @@ public class StackPieceChooser: MonoBehaviour
         pieceDetailPanel.dataSource = GameManager.Instance;
     }
 
-    public void SyncWithStack(List<Piece> pieces)
+    public void SyncWithStack(List<AbstractViewer> viewers)
     {
         stackPieceChooser.Clear();
 
-        foreach(var piece in pieces)
+        foreach(var viewer in viewers)
         {
-            var sprite = PieceViewer.GetSprite(piece);
+            var sprite = viewer.GetSprite();
 
             var item = itemTemplate.CloneTree();
             var icon = item.Q<VisualElement>("Icon");
             icon.style.backgroundImage = new(sprite);
 
-            item.AddManipulator(new Clickable(() => {
-                Debug.Log($"Item clicked: {piece.name}");
-
-                GameManager.Instance.OnPieceClicked(piece);
-            }));
-
             stackPieceChooser.Add(item);
+
+            if(viewer is PieceViewer pieceViewer)
+            {
+                var piece = pieceViewer.currentPiece;
+
+                item.AddManipulator(new Clickable(() => {
+                    Debug.Log($"Item clicked: {piece.name}");
+
+                    GameManager.Instance.OnPieceClicked(piece);
+                }));
+            }
+            if(viewer is DamageTokenViewer damageTokenViewer)
+            {
+                Debug.Log($"Damage Token is clicked: {damageTokenViewer}");
+            }
         }
     }
 

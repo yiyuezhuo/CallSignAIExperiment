@@ -3,9 +3,10 @@ using UnityEngine.EventSystems;
 using Unity.Properties;
 using CallSignLib;
 using System.Collections.Generic;
+using System;
 using TMPro;
 using System.Linq;
-using Unity.VisualScripting;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
     public int currentX;
     public int currentY;
 
-    [DoNotSerialize]
+    // [NonSerialized]
     public Piece currentPiece = null;
 
     public Transform redNotDeployedTransform;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     public GameObject labelPrefab;
 
     public GameObject piecePrefab;
+    public GameObject damageTokenPrefab;
 
     public bool showLabels;
 
@@ -54,6 +56,7 @@ public class GameManager : MonoBehaviour
     public State state;
 
     public Dictionary<Piece, PieceViewer> pieceToViewer = new();
+    public Dictionary<Side, DamageTokenViewer> sideToDamageTokenViewer = new();
 
     public LayerMask pieceLayer;
     public LayerMask mapLayer;
@@ -114,13 +117,23 @@ public class GameManager : MonoBehaviour
 
     public void InitialSetup()
     {
-        foreach(var piece in gameState.pieces)
+        foreach(var piece in gameState.pieces) // Piece State => Viewer
         {
             var pieceViewer = Instantiate(piecePrefab, pieceViewersTransform).GetComponent<PieceViewer>();
             pieceViewer.currentPiece = piece;
             pieceViewer.SyncTexture();
             pieceToViewer[piece] = pieceViewer;
             pieceViewer.name = $"{piece.name} ({piece.id})";
+        }
+
+        foreach(var sideData in gameState.sideData) // Side State => Viewer
+        {
+            // sideToDamageToken[sideData.side] = new DamageToken();
+            var damageTokenViewer = Instantiate(damageTokenPrefab, pieceViewersTransform).GetComponent<DamageTokenViewer>();
+            damageTokenViewer.side = sideData.side;
+            sideToDamageTokenViewer[sideData.side] = damageTokenViewer;
+            damageTokenViewer.name = $"{sideData.side} Damage Token";
+            damageTokenViewer.gameObject.SetActive(false);
         }
 
         UpdateStackLocations();
@@ -134,10 +147,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public Dictionary<(StackType, int, int), List<Piece>> CollectStackKeyToPieces()
+    public Dictionary<(StackType, int, int), List<AbstractViewer>> CollectStackKeyToPieces()
     {
         // (StackType, x, y) => Piece
-        var stackKeyToPieces = new Dictionary<(StackType, int, int), List<Piece>>();
+        var stackKeyToPieces = new Dictionary<(StackType, int, int), List<AbstractViewer>>(); // TODO: Use OneOf?
+        // Collect Pieces
         foreach(var piece in gameState.pieces)
         {
             // var stackType = (piece.mapState, piece.side) switch
@@ -164,7 +178,29 @@ public class GameManager : MonoBehaviour
             {
                 stackKeyToPieces[stackKey] = stack = new();
             }
-            stack.Add(piece);
+            stack.Add(pieceToViewer[piece]);
+        }
+
+        // Collect Virtualized damaged tokens
+        foreach(var sideData in gameState.sideData)
+        {
+            var damageTokenViewer = sideToDamageTokenViewer[sideData.side];
+            if(sideData.carrirDamage > 0)
+            {
+                damageTokenViewer.gameObject.SetActive(true);
+
+                (var x, var y) = sideData.carrirCenter;
+                var stackKey = (StackType.Map, x, y);
+                if(!stackKeyToPieces.TryGetValue(stackKey,  out var stack))
+                {
+                    stackKeyToPieces[stackKey] = stack = new();
+                }
+                stack.Add(damageTokenViewer);
+            }
+            else
+            {
+                damageTokenViewer.gameObject.SetActive(false);
+            }
         }
         return stackKeyToPieces;
     }
@@ -202,23 +238,12 @@ public class GameManager : MonoBehaviour
         foreach(((var stackType, var gameX, var gameY), var stack) in stackKeyToPieces)
         {
             var n=0;
-            foreach(var piece in stack)
+            foreach(var viewer in stack)
             {
-                var pieceViewer = pieceToViewer[piece];
-
-                // var worldPos = stackType switch
-                // {
-                //     StackType.RedNotDeployed => redNotDeployedTransform.position,
-                //     StackType.RedRegenerated => redDestroyedTransform.position,
-                //     StackType.BlueNotDeployed => blueNotDeployedTransform.position,
-                //     StackType.BlueRegenerated => blueDestroyedTransform.position,
-                //     _ => GameXYToWorldPos(piece.x, piece.y)
-                // };
-
                 var refRecord = refAreaRecords.FirstOrDefault(r => r.stackType == stackType);
-                var worldPos = refRecord != null ? refRecord.transform.position : GameXYToWorldPos(piece.x, piece.y);
+                var worldPos = refRecord != null ? refRecord.transform.position : viewer.GetWorldPos();
 
-                pieceViewer.SetStackOffset(n, worldPos);
+                viewer.SetStackOffset(n, worldPos);
                 n++;
             }
         }
@@ -291,7 +316,7 @@ public class GameManager : MonoBehaviour
                             currentPiece = pieceViewer.currentPiece;
 
                             var stackKeyToPieces = CollectStackKeyToPieces();
-                            (var selectedStackKey, var selectedStack) = stackKeyToPieces.First(p => p.Value.Contains(pieceViewer.currentPiece));
+                            (var selectedStackKey, var selectedStack) = stackKeyToPieces.First(p => p.Value.Contains(pieceViewer));
 
                             OnStackClicked(selectedStack);
                         }
@@ -356,9 +381,9 @@ public class GameManager : MonoBehaviour
         labelsTransform.gameObject.SetActive(showLabels);
     }
 
-    public void OnStackClicked(List<Piece> pieces)
+    public void OnStackClicked(List<AbstractViewer> pieces)
     {
-        Debug.Log(string.Format("Clicked on stack: {0}", string.Join(",", pieces.Select(p => p.name))));
+        Debug.Log(string.Format("Clicked on stack: {0}", string.Join(",", pieces.Select(p => p))));
 
         StackPieceChooser.Instance.SyncWithStack(pieces);
     }
@@ -391,8 +416,8 @@ public class GameManager : MonoBehaviour
     }
 
     // [CreateProperty]
-    // public currentGameState
 
+    // public currentGameState
 
     public static GameManager _instance;
     public static GameManager Instance

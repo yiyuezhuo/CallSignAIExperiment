@@ -2,16 +2,9 @@ using CallSignLib;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PieceViewer: MonoBehaviour
+public class PieceViewer: AbstractViewer
 {
     public Piece currentPiece;
-
-    SpriteRenderer spriteRenderer;
-
-    void Awake()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
 
     void Start()
     {
@@ -53,15 +46,21 @@ public class PieceViewer: MonoBehaviour
         return sym;
     }
 
-    public static Sprite GetSprite(Piece currentPiece)
-    {
-        return Resources.Load<Sprite>(GetTextureName(currentPiece));
-    }
+    // public static Sprite GetSprite(Piece currentPiece)
+    // {
+    //     return Resources.Load<Sprite>(GetTextureName(currentPiece));
+    // }
+
+    public override Sprite GetSprite() => Resources.Load<Sprite>(GetTextureName(currentPiece));
 
     public void SyncTexture()
     {
-        spriteRenderer.sprite = GetSprite(currentPiece);
-        
+        spriteRenderer.sprite = GetSprite();
+    }
+
+    public override Vector3 GetWorldPos()
+    {
+        return GameManager.Instance.GameXYToWorldPos(currentPiece.x, currentPiece.y);
     }
 
     void Update()
@@ -69,10 +68,4 @@ public class PieceViewer: MonoBehaviour
         
     }
 
-    public void SetStackOffset(int n, Vector3 worldPos)
-    {
-        spriteRenderer.sortingOrder = n;
-        const float offset = 0.15f;
-        transform.position = worldPos + new Vector3(n*offset, n*offset, 0);
-    }
 }
