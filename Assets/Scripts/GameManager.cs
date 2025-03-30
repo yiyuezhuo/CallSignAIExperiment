@@ -34,7 +34,15 @@ public class GameManager : MonoBehaviour
 
     public bool showLabels;
 
-    public RandomAgent randomAgent = new();
+    public AbstractAgent currentAgent;
+    public List<AbstractAgent> agents = new()
+    {
+        new RandomAgent(),
+        new BaselineAgent(),
+        new BaselineAgent2(),
+        new BaselineAgent3(),
+        new BaselineAgent4()
+    };
 
     public enum StackType
     {
@@ -78,6 +86,8 @@ public class GameManager : MonoBehaviour
     {
         pieceLayer = LayerMask.GetMask("Piece"); // Can't be set in the declaration
         mapLayer = LayerMask.GetMask("Map");
+
+        currentAgent = agents[^1]; // Baseline Agent
 
         refAreaRecords = new()
         {

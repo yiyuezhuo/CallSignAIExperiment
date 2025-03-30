@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using CallSignLib;
 using System.Collections.Generic;
+using System.Linq;
 
 public class StatusViewer : MonoBehaviour
 {
@@ -128,6 +129,9 @@ public class StatusViewer : MonoBehaviour
         {
             element.userData = index;
         };
+
+        var agentDropdownField = root.Q<DropdownField>("AgentDropdownField");
+        agentDropdownField.choices = GameManager.Instance.agents.Select(a => a.GetName()).ToList();
     }
 
 
@@ -206,7 +210,7 @@ public class StatusViewer : MonoBehaviour
             }
             else if(gmr.gameState.currentSide != gmr.playingSide)
             {
-                gmr.randomAgent.Run(gmr.gameState);
+                CurrentAgentRunGameState();
             }
             else
             {
@@ -215,6 +219,25 @@ public class StatusViewer : MonoBehaviour
         }
 
         gmr.UpdateStackLocations();
+    }
+
+    public void CurrentAgentRunGameState()
+    {
+        var gmr = GameManager.Instance;
+
+        if(gmr.currentAgent is StateScoreBasedAgent socredAgent)
+        {
+            var action = socredAgent.Policy(gmr.gameState);
+            var prevScore = socredAgent.EstimateState(gmr.gameState);
+
+            var newState = gmr.gameState.Clone();
+            action.Execute(newState);
+            var newScore = socredAgent.EstimateState(newState);
+
+            Debug.LogWarning($"Score: {prevScore} => {newScore} ({action})");
+        }
+        
+        gmr.currentAgent.Run(gmr.gameState);
     }
 
     public void OnEndEditAndNextPhaseButton()
@@ -242,7 +265,8 @@ public class StatusViewer : MonoBehaviour
 
         if(gmr.gameState.IsNeedAction())
         {
-            gmr.randomAgent.Run(gmr.gameState);
+            // gmr.currentAgent.Run(gmr.gameState);
+            CurrentAgentRunGameState();
         }
         else
         {

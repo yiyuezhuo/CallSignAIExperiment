@@ -727,6 +727,8 @@ public class GameState
             sideData=sideData
         };
     }
+
+    public static int GetSimpleHexIdx(Piece piece) => grid.xyToSimpleIdx[(piece.x, piece.y)];
 }
 
 }

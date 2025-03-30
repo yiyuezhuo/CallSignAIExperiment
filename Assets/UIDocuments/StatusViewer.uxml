@@ -57,7 +57,7 @@
                 </engine:VisualElement>
             </engine:Tab>
             <engine:Tab label="Debug">
-                <engine:VisualElement style="flex-grow: 1;">
+                <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
                     <engine:Button text="Show Current Action" name="ShowCurrentActionButton" />
                     <engine:Button text="Show Current State" name="ShowCurrentStateButton" />
                     <engine:Label text="Show Labels" style="-unity-text-align: middle-left;" />
@@ -66,6 +66,12 @@
                             <engine:DataBinding property="value" data-source-path="showLabels" binding-mode="TwoWay" />
                         </Bindings>
                     </engine:Toggle>
+                    <engine:Label text="Agent" style="-unity-text-align: middle-left;" />
+                    <engine:DropdownField name="AgentDropdownField">
+                        <Bindings>
+                            <engine:DataBinding property="index" data-source-path="currentAgent" source-to-ui-converters="Agent =&gt; idx" ui-to-source-converters="idx =&gt; agent" binding-mode="TwoWay" />
+                        </Bindings>
+                    </engine:DropdownField>
                 </engine:VisualElement>
             </engine:Tab>
         </engine:TabView>

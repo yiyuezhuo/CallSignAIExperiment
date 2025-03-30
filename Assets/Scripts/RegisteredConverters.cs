@@ -101,6 +101,16 @@ public static class RegisteredConverters
             };
         });
         ConverterGroups.RegisterConverterGroup(group);
+
+        Register("idx => agent", (ref int idx) => GameManager.Instance.agents[idx]);
+        Register("Agent => idx", (ref AbstractAgent agent) => GameManager.Instance.agents.IndexOf(agent));
+    }
+
+    static void Register<TSource, TDestination>(string name, TypeConverter<TSource, TDestination> converter)
+    {
+        var group = new ConverterGroup(name);
+        group.AddConverter(converter);
+        ConverterGroups.RegisterConverterGroup(group);
     }
 
     static string GetNameFromPieceId(int id)

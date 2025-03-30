@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using GameAlgorithms;
+
 
 namespace CallSignLib
 {
-    public class FrozenHexGrid
+
+public class FrozenHexGrid
 {
     public class Hex
     {
@@ -26,6 +30,11 @@ namespace CallSignLib
     }
 
     public Dictionary<(int, int), Hex> hexMap = new();
+    public SimpleGraph simpleGraph;
+    public Dictionary<(int, int), int> xyToSimpleIdx = new();
+    public Dictionary<int, (int, int)> simpleIdxToXY = new();
+
+    public Hex GetHex(int simpleId) => hexMap[simpleIdxToXY[simpleId]];
 
     public static FrozenHexGrid Make(DynamicHexGrid dynamicGrid)
     {
@@ -47,7 +56,29 @@ namespace CallSignLib
                 hex.neighbors.Add(hexMap[nei]);
             }
         }
-        return new(){hexMap=hexMap};
+
+        // Simplified Graph
+        var idx = 0;
+        var xyToSimpleIdx = new Dictionary<(int, int), int>();
+        var simpleIdxToXY = new Dictionary<int, (int, int)>();
+        var idxs = new List<int>();
+        foreach((var xy, var hex) in hexMap)
+        {
+            idxs.Add(idx);
+            xyToSimpleIdx[xy] = idx;
+            simpleIdxToXY[idx] = xy;
+            idx++;
+        }
+
+        List<int[]> neighbors = new();
+        foreach((var xy, var hex) in hexMap)
+        {
+            idx = xyToSimpleIdx[xy];
+            neighbors.Add(hex.neighbors.Select(hex => xyToSimpleIdx[(hex.x, hex.y)]).ToArray());
+        }
+        SimpleGraph simpleGraph = new(){nodes=idxs.ToArray(), neighbors=neighbors.ToArray()};
+
+        return new(){hexMap=hexMap, simpleGraph=simpleGraph, xyToSimpleIdx=xyToSimpleIdx, simpleIdxToXY=simpleIdxToXY};
     }
 
     public static FrozenHexGrid Make() => Make(new());
