@@ -9,18 +9,18 @@ using System.IO;
 namespace CallSignLib
 {
 
-public interface IGameAction
+public abstract class AbstractGameAction
 {
-    void Execute(GameState state);
+    public abstract void Execute(GameState state);
 }
 
-public class MoveAction : IGameAction
+public class MoveAction : AbstractGameAction
 {
     public int pieceId;
     public int toX;
     public int toY;
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         var piece = state.pieces.Find(x => x.id == pieceId);
         piece.x = toX;
@@ -33,7 +33,7 @@ public class MoveAction : IGameAction
     }
 }
 
-public class C2MoveAction : IGameAction
+public class C2MoveAction : AbstractGameAction
 {
     public int pieceidC2;
     public int pieceId1;
@@ -43,7 +43,7 @@ public class C2MoveAction : IGameAction
     public int toX2;
     public int toY2;
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         var piece1 = state.pieces.Find(x => x.id == pieceId1);
         var piece2 = state.pieces.Find(x => x.id == pieceId2);
@@ -62,13 +62,13 @@ public class C2MoveAction : IGameAction
 
 }
 
-public class DeployAction : IGameAction
+public class DeployAction : AbstractGameAction
 {
     public int pieceId;
     public int toX;
     public int toY;
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         var piece = state.pieces.Find(x => x.id == pieceId);
         piece.x = toX;
@@ -83,13 +83,13 @@ public class DeployAction : IGameAction
 
 }
 
-public class RegenerateAction : IGameAction
+public class RegenerateAction : AbstractGameAction
 {
     public int pieceId;
     public int toX;
     public int toY;
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         var piece = state.pieces.Find(x => x.id == pieceId);
         piece.x = toX;
@@ -104,9 +104,9 @@ public class RegenerateAction : IGameAction
 
 }
 
-public class NullAction : IGameAction
+public class NullAction : AbstractGameAction
 {
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
     }
 
@@ -117,7 +117,7 @@ public class NullAction : IGameAction
 
 }
 
-public class EngagmentDeclare : IGameAction
+public class EngagmentDeclare : AbstractGameAction
 {
     public enum EngagementType
     {
@@ -140,7 +140,7 @@ public class EngagmentDeclare : IGameAction
 
     public List<EngagementRecord> records = new();
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         state.engagementDeclares.AddRange(records);
     }
@@ -153,7 +153,7 @@ public class EngagmentDeclare : IGameAction
 
 }
 
-public class EvadingDeclare : IGameAction
+public class EvadingDeclare : AbstractGameAction
 {
     public class EvadingRecord
     {
@@ -169,7 +169,7 @@ public class EvadingDeclare : IGameAction
 
     public List<EvadingRecord> records = new();
 
-    public void Execute(GameState state)
+    public override void Execute(GameState state)
     {
         state.evadingDeclares.AddRange(records);
     }
@@ -200,6 +200,8 @@ public class GameState
     public List<EngagmentDeclare.EngagementRecord> engagementDeclares = new();
     // public List<int> engagementCarrierDeclares = new();
     public List<EvadingDeclare.EvadingRecord> evadingDeclares = new();
+
+    static Random rand = new();
 
     public enum VictoryStatus
     {
@@ -508,9 +510,9 @@ public class GameState
 
     public GameState Clone() => FromXML(ToXML()); // Warning: potential duplicated ToXML calls.
 
-    public List<IGameAction> GetActions()
+    public List<AbstractGameAction> GetActions()
     {
-        var actions = new List<IGameAction>(){new NullAction()};
+        var actions = new List<AbstractGameAction>(){new NullAction()};
 
         if(currentPhase == Phase.Action)
         {
@@ -726,6 +728,31 @@ public class GameState
             blueDamage=0,
             sideData=sideData
         };
+    }
+
+    public static GameState RandomSetup()
+    {
+        var state = Setup();
+        foreach(var piece in state.pieces)
+        {
+            if(rand.NextDouble() < 0.1f)
+            {
+                piece.mapState = MapState.NotDeployed;
+            }
+            else if(rand.NextDouble() < 0.15f)
+            {
+                piece.mapState = MapState.Destroyed;
+            }
+            else
+            {
+                piece.mapState = MapState.OnMap;
+                var hexId = rand.Next(grid.GetHexCount());
+                var hex = grid.GetHex(hexId);
+                piece.x = hex.x;
+                piece.y = hex.y;
+            }
+        }
+        return state;
     }
 
     public static int GetSimpleHexIdx(Piece piece) => grid.xyToSimpleIdx[(piece.x, piece.y)];

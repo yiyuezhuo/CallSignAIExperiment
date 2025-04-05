@@ -3,59 +3,20 @@ using UnityEngine.UIElements;
 using CallSignLib;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using System;
 
 public class StatusViewer : MonoBehaviour
 {
     public ListView engagementRecordListView;
 
-    // public class EngagementRecordBinder
-    // {
-    //     VisualElement shooterIcon;
-    //     VisualElement targetIcon;
-    //     Clickable shooterManipulator;
-    //     Clickable targetManipulator;
+    public int currentTotal;
 
-    //     public void BindItem(VisualElement element, int index)
-    //     {
-    //         if(element.userData != null)
-    //             return;
-            
-    //         shooterIcon = element.Q<VisualElement>("ShooterIcon");
-    //         targetIcon = element.Q<VisualElement>("TargetIcon");
+    public int currentCompleted;
 
-    //         shooterManipulator = new Clickable(() => {
-    //             Debug.Log($"Shooter clicked: {index}");
-    //         });
-    //         targetManipulator = new Clickable(() => {
-    //             Debug.Log($"Target clicked: {index}");
-    //         });
+    public string currentResult;
 
-    //         shooterIcon.AddManipulator(shooterManipulator);
-    //         targetIcon.AddManipulator(targetManipulator);
-
-    //         element.userData = this;
-    //     }
-
-    //     public void UnbindItem(VisualElement element, int index)
-    //     {
-    //         if(element.userData != this)
-    //         {
-    //             shooterIcon.RemoveManipulator(shooterManipulator);
-    //             targetIcon.RemoveManipulator(targetManipulator);
-
-    //             element.userData = null;
-    //         }
-    //     }
-    // }
-
-    // public class EngagementRecordBinderFactory
-    // {
-    //     public void BindItem(VisualElement element, int index)
-    //     {
-    //         var binder = new EngagementRecordBinder();
-    //         binder.BindItem(element, index);
-    //     }
-    // }
+    public ReplayGenerator.SetupMode currentSetupMode;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -85,6 +46,37 @@ public class StatusViewer : MonoBehaviour
         var commitButton = root.Q<Button>("CommitButton");
         commitButton.clicked += OnCommitButtonClicked;
         commitButton.dataSource = GameManager.Instance;
+
+        var exportCurrentStateButton = root.Q<Button>("ExportCurrentStateButton");
+        exportCurrentStateButton.clicked += OnExportCurrentStateButtonClicked;
+
+        var webglDebugButton = root.Q<Button>("WebGLDebugButton");
+        webglDebugButton.clicked += () =>
+        {
+            SceneManager.LoadScene("CanvasSampleScene");
+        };
+
+        var replayDiv = root.Q<VisualElement>("ReplayDiv");
+        replayDiv.dataSource = this;
+
+        currentTotal = 10;
+
+        var selfPlayAndCacheButton = root.Q<Button>("SelfPlayAndCacheButton");
+        selfPlayAndCacheButton.clicked += OnSelfPlayAndCacheButtonClicked;
+
+        var selfReplayProgressBar = root.Q<ProgressBar>("SelfReplayProgressBar");
+       // selfReplayProgressBar.dataSource = this;
+
+        var exportReplayButton = root.Q<Button>("ExportReplayButton");
+        exportReplayButton.clicked += () =>
+        {
+            Debug.Log("exportReplayButton.clicked");
+            if(currentResult != null)
+            {
+                UnityUtils.SaveTextFile(currentResult, "replay", "xml");
+            }
+        };
+        // exportReplayButton.dataSource = this;
 
         engagementRecordListView = root.Q<ListView>("EngagementRecordListView");
         engagementRecordListView.SetBinding("itemsSource", new DataBinding(){dataSourcePath=new Unity.Properties.PropertyPath("gameState.engagementDeclares")});
@@ -120,11 +112,6 @@ public class StatusViewer : MonoBehaviour
             return el;
         };
 
-        // var binder = new EngagementRecordBinder();
-
-        // engagementRecordListView.bindItem += binder.BindItem;
-        // engagementRecordListView.unbindItem += binder.UnbindItem;
-
         engagementRecordListView.bindItem = (VisualElement element, int index) =>
         {
             element.userData = index;
@@ -132,6 +119,50 @@ public class StatusViewer : MonoBehaviour
 
         var agentDropdownField = root.Q<DropdownField>("AgentDropdownField");
         agentDropdownField.choices = GameManager.Instance.agents.Select(a => a.GetName()).ToList();
+    }
+
+    void OnSelfPlayAndCacheButtonClicked()
+    {
+        Debug.Log("OnSelfPlayAndExportButtonClicked");
+
+        currentResult = null;
+        // currentTotal = 10;
+        currentCompleted = 0;
+
+        var replayGenerator = new ReplayGenerator()
+        {
+            agent=GameManager.Instance.currentAgent,
+            total=currentTotal,
+            setupMode=currentSetupMode
+        };
+        replayGenerator.newReplayGenerated += (sender, args) =>
+        {
+            (var idx, var pairSeq) = args;
+            currentCompleted = idx + 1;
+            Debug.Log($"{idx}/{replayGenerator.total}: len={pairSeq.Count}");
+        };
+        replayGenerator.newGameStateGenerated += (sender, args) =>
+        {
+            (var i, var pair) = args;
+            GameManager.Instance.gameState = pair.state;
+            GameManager.Instance.UpdateStackLocations();
+            Debug.Log($"Tick: {i}");
+        };
+        replayGenerator.completed += (sender, result) =>
+        {
+            currentResult = replayGenerator.ToXML();
+            // var textData = replayGenerator.ToXML();
+            // UnityUtils.SaveTextFile(textData, "replay", "xml");
+        };
+        // var replays = replayGenerator.Generate();
+        StartCoroutine(replayGenerator.Generate());
+    }
+
+    void OnExportCurrentStateButtonClicked()
+    {
+        Debug.Log("OnExportCurrentStateButtonClicked");
+
+        UnityUtils.SaveTextFile(GameManager.Instance.gameState.ToXML(), "gameState", "xml");
     }
 
 

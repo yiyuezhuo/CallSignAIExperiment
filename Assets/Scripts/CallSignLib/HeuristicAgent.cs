@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameAlgorithms;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime;
 
 namespace CallSignLib
 {
@@ -26,7 +24,7 @@ public abstract class AbstractAgent
         state.NextPhase();
     }
 
-    public abstract IGameAction Policy(GameState state);
+    public abstract AbstractGameAction Policy(GameState state);
     public virtual string GetName() => GetType().Name;
 }
 
@@ -34,7 +32,7 @@ public class RandomAgent : AbstractAgent
 {
     static Random rand = new Random();
 
-    public override IGameAction Policy(GameState state)
+    public override AbstractGameAction Policy(GameState state)
     {
         var actions = state.GetActions();
         var idx = rand.Next(actions.Count);
@@ -49,12 +47,12 @@ public abstract class StateScoreBasedAgent : AbstractAgent
 
     public class Record
     {
-        public IGameAction action;
+        public AbstractGameAction action;
         public GameState toState;
         public float score;
     }
 
-    public override IGameAction Policy(GameState state)
+    public override AbstractGameAction Policy(GameState state)
     {
         var actions = state.GetActions();
         var records = new List<Record>();

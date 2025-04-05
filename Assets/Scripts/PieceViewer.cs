@@ -1,10 +1,14 @@
 using CallSignLib;
 using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Properties;
 
 public class PieceViewer: AbstractViewer
 {
-    public Piece currentPiece;
+    [CreateProperty]
+    public Piece currentPiece{get => GameManager.Instance.gameState.pieces[currentPieceId];}
+
+    public int currentPieceId;
 
     void Start()
     {

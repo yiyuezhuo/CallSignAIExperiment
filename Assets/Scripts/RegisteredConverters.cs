@@ -104,6 +104,9 @@ public static class RegisteredConverters
 
         Register("idx => agent", (ref int idx) => GameManager.Instance.agents[idx]);
         Register("Agent => idx", (ref AbstractAgent agent) => GameManager.Instance.agents.IndexOf(agent));
+
+        Register("string => bool", (ref string s) => s != null && s != "");
+        Register("StatusViewer => string (progress)", (ref StatusViewer statusViewer) => $"{statusViewer.currentCompleted}/{statusViewer.currentTotal}");
     }
 
     static void Register<TSource, TDestination>(string name, TypeConverter<TSource, TDestination> converter)

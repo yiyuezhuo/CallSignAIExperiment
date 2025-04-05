@@ -35,6 +35,7 @@ public class FrozenHexGrid
     public Dictionary<int, (int, int)> simpleIdxToXY = new();
 
     public Hex GetHex(int simpleId) => hexMap[simpleIdxToXY[simpleId]];
+    public int GetHexCount() => hexMap.Count;
 
     public static FrozenHexGrid Make(DynamicHexGrid dynamicGrid)
     {

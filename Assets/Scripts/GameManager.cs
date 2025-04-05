@@ -63,7 +63,8 @@ public class GameManager : MonoBehaviour
 
     public State state;
 
-    public Dictionary<Piece, PieceViewer> pieceToViewer = new();
+    // public Dictionary<Piece, PieceViewer> pieceToViewer = new();
+    public Dictionary<int, PieceViewer> pieceIdToViewer = new();
     public Dictionary<Side, DamageTokenViewer> sideToDamageTokenViewer = new();
 
     public LayerMask pieceLayer;
@@ -130,9 +131,10 @@ public class GameManager : MonoBehaviour
         foreach(var piece in gameState.pieces) // Piece State => Viewer
         {
             var pieceViewer = Instantiate(piecePrefab, pieceViewersTransform).GetComponent<PieceViewer>();
-            pieceViewer.currentPiece = piece;
+            pieceViewer.currentPieceId = piece.id;
             pieceViewer.SyncTexture();
-            pieceToViewer[piece] = pieceViewer;
+            // pieceToViewer[piece] = pieceViewer;
+            pieceIdToViewer[piece.id] = pieceViewer;
             pieceViewer.name = $"{piece.name} ({piece.id})";
         }
 
@@ -188,7 +190,8 @@ public class GameManager : MonoBehaviour
             {
                 stackKeyToPieces[stackKey] = stack = new();
             }
-            stack.Add(pieceToViewer[piece]);
+            // stack.Add(pieceToViewer[piece]);
+            stack.Add(pieceIdToViewer[piece.id]);
         }
 
         // Collect Virtualized damaged tokens

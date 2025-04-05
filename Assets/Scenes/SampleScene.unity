@@ -1493,6 +1493,22 @@ MonoBehaviour:
     victorySide: 0
   currentX: 0
   currentY: 0
+  currentPiece:
+    id: 0
+    name: 
+    side: 0
+    mapState: 0
+    x: 0
+    y: 0
+    antiAirRating: 0
+    antiShipRating: 0
+    antiAirRange: 0
+    antiShipRange: 0
+    specialRange: 0
+    fuelRange: 0
+    isJammer: 0
+    isC2: 0
+    isTanker: 0
   redNotDeployedTransform: {fileID: 1979641237}
   redDestroyedTransform: {fileID: 555231318}
   blueNotDeployedTransform: {fileID: 1265604293}
@@ -1773,6 +1789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f600c5a6b70a47b41bbd8b26a61f0973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentTotal: 0
+  currentCompleted: 0
 --- !u!114 &1769480198
 MonoBehaviour:
   m_ObjectHideFlags: 0
