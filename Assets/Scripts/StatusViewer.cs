@@ -141,7 +141,7 @@ public class StatusViewer : MonoBehaviour
             currentCompleted = idx + 1;
             Debug.Log($"{idx}/{replayGenerator.total}: len={pairSeq.Count}");
         };
-        replayGenerator.newGameStateGenerated += (sender, args) =>
+        replayGenerator.newPairGenerated += (sender, args) =>
         {
             (var i, var pair) = args;
             GameManager.Instance.gameState = pair.state;
@@ -182,7 +182,7 @@ public class StatusViewer : MonoBehaviour
             var v = engagementRecordListView.itemsSource[i];
             if(v == null)
             {
-                engagementRecordListView.itemsSource[i] = new EngagmentDeclare.EngagementRecord(){
+                engagementRecordListView.itemsSource[i] = new EngagementDeclare.EngagementRecord(){
                     shooterPieceId=-1,
                     targetPieceId=-1
                 };

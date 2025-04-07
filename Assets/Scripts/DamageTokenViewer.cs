@@ -28,7 +28,7 @@ public class DamageTokenViewer : AbstractViewer
 
     public override Vector3 GetWorldPos()
     {
-        (var x, var y) =  GameManager.Instance.gameState.sideData.First(s => s.side == side).carrirCenter;
+        (var x, var y) =  GameManager.Instance.gameState.sideData.First(s => s.side == side).carrierCenter;
         return GameManager.Instance.GameXYToWorldPos(x, y);
     }
 

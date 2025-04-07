@@ -60,32 +60,32 @@ public static class RegisteredConverters
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("EngagmentDeclare.EngagementType => bool");
-        group.AddConverter((ref EngagmentDeclare.EngagementType et) => et == EngagmentDeclare.EngagementType.Aircraft);
+        group.AddConverter((ref EngagementDeclare.EngagementType et) => et == EngagementDeclare.EngagementType.Aircraft);
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("bool => EngagmentDeclare.EngagementType");
-        group.AddConverter((ref bool b) => b ? EngagmentDeclare.EngagementType.Aircraft: EngagmentDeclare.EngagementType.Carrier);
+        group.AddConverter((ref bool b) => b ? EngagementDeclare.EngagementType.Aircraft: EngagementDeclare.EngagementType.Carrier);
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("EngagmentDeclare.EngagementRecord => shooter Name");
-        group.AddConverter((ref EngagmentDeclare.EngagementRecord r) => GetNameFromPieceId(r.shooterPieceId));
+        group.AddConverter((ref EngagementDeclare.EngagementRecord r) => GetNameFromPieceId(r.shooterPieceId));
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("EngagmentDeclare.EngagementRecord => target Name");
-        group.AddConverter((ref EngagmentDeclare.EngagementRecord r) => {
-            if(r.type == EngagmentDeclare.EngagementType.Carrier)
+        group.AddConverter((ref EngagementDeclare.EngagementRecord r) => {
+            if(r.type == EngagementDeclare.EngagementType.Carrier)
                 return "Carrier";
             return GetNameFromPieceId(r.targetPieceId);
         });
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("EngagementRecord => shooter image");
-        group.AddConverter((ref EngagmentDeclare.EngagementRecord r) => GetStyleBackgroundFromPieceId(r.shooterPieceId));
+        group.AddConverter((ref EngagementDeclare.EngagementRecord r) => GetStyleBackgroundFromPieceId(r.shooterPieceId));
         ConverterGroups.RegisterConverterGroup(group);
 
         group = new ConverterGroup("EngagementRecord => target image");
-        group.AddConverter((ref EngagmentDeclare.EngagementRecord r) => {
-            if(r.type == EngagmentDeclare.EngagementType.Carrier)
+        group.AddConverter((ref EngagementDeclare.EngagementRecord r) => {
+            if(r.type == EngagementDeclare.EngagementType.Carrier)
                 return null;
             return GetStyleBackgroundFromPieceId(r.targetPieceId);
         });

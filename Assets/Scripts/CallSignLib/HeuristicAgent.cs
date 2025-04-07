@@ -97,7 +97,7 @@ public class BaselineAgent : StateScoreBasedAgent
 
     public int[] CalculateOtherCarrierDistanceField(GameState state)
     {
-        var otherSideCarrierXY = state.sideData.Find(s => s.side != state.currentSide).carrirCenter;
+        var otherSideCarrierXY = state.sideData.Find(s => s.side != state.currentSide).carrierCenter;
         var carrierIdx = GameState.grid.xyToSimpleIdx[otherSideCarrierXY];
         var otherCarrierDistanceField = GameState.grid.simpleGraph.GetDistanceField(carrierIdx);
         return otherCarrierDistanceField;
@@ -107,7 +107,7 @@ public class BaselineAgent : StateScoreBasedAgent
     {
         var fuelSourceDistanceField = GameState.grid.simpleGraph.GetDistanceField(
             GameState.grid.xyToSimpleIdx[
-                state.sideData.Find(s => s.side == state.currentSide).carrirCenter
+                state.sideData.Find(s => s.side == state.currentSide).carrierCenter
             ]
         );
         foreach(var tanker in state.pieces.Where(p => p.side == state.currentSide && p.isTanker && p.mapState == MapState.OnMap))
@@ -165,7 +165,7 @@ public class BaselineAgent : StateScoreBasedAgent
             var shooter = state.pieces[engage.shooterPieceId];
             // if(shooter.antiShipRating > shooter.antiAirRange && engage.type == EngagmentDeclare.EngagementType.Carrier) // bomber strike bomber if possible
             //     return 10;
-            if(engage.type == EngagmentDeclare.EngagementType.Carrier) // strike bomber if possible
+            if(engage.type == EngagementDeclare.EngagementType.Carrier) // strike bomber if possible
                 return 10;
             if(engage.targetPieceId != -1)
             {

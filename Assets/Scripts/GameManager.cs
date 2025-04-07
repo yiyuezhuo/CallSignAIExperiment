@@ -198,11 +198,11 @@ public class GameManager : MonoBehaviour
         foreach(var sideData in gameState.sideData)
         {
             var damageTokenViewer = sideToDamageTokenViewer[sideData.side];
-            if(sideData.carrirDamage > 0)
+            if(sideData.carrierDamage > 0)
             {
                 damageTokenViewer.gameObject.SetActive(true);
 
-                (var x, var y) = sideData.carrirCenter;
+                (var x, var y) = sideData.carrierCenter;
                 var stackKey = (StackType.Map, x, y);
                 if(!stackKeyToPieces.TryGetValue(stackKey,  out var stack))
                 {
@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour
         foreach(var piece in gameState.pieces)
         {
             piece.mapState = MapState.OnMap;
-            (piece.x, piece.y) = gameState.sideData[0].carrirCenter;
+            (piece.x, piece.y) = gameState.sideData[0].carrierCenter;
         }
 
         UpdateStackLocations();

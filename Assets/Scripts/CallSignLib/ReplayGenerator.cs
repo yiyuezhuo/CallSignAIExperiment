@@ -41,7 +41,7 @@ public class ReplayCollection
 
 public class ReplayGenerator
 {
-    public event EventHandler<(int, StateActionPair)> newGameStateGenerated;
+    public event EventHandler<(int, StateActionPair)> newPairGenerated;
     public event EventHandler<(int, List<StateActionPair>)> newReplayGenerated;
     public event EventHandler<ReplayCollection> completed;
     public int total;
@@ -89,15 +89,18 @@ public class ReplayGenerator
                 }
                 else
                 {
-                    agent.Run(state);
+                    // agent.Run(state);
+                    var stateBefore = state.Clone();
                     var action = agent.Policy(state);
+
+                    var pair = new StateActionPair(){state=stateBefore, action=action};
+                    pairSeq.Add(pair);
+                    newPairGenerated?.Invoke(this, (j, pair));
+                    j++;
+
                     action.Execute(state);
-                    var pair = new StateActionPair(){state=state.Clone(), action=action};
                     state.NextPhase();
 
-                    pairSeq.Add(pair);
-                    j++;
-                    newGameStateGenerated?.Invoke(this, (j, pair));
                     if(stopwatch.ElapsedMilliseconds >= maxMs)
                     {
                         yield return null;
@@ -136,7 +139,7 @@ public class ReplayGenerator
         typeof(DeployAction),
         typeof(RegenerateAction),
         typeof(NullAction),
-        typeof(EngagmentDeclare),
+        typeof(EngagementDeclare),
         typeof(EvadingDeclare),
     };
 

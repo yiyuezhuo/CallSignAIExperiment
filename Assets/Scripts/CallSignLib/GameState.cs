@@ -117,7 +117,7 @@ public class NullAction : AbstractGameAction
 
 }
 
-public class EngagmentDeclare : AbstractGameAction
+public class EngagementDeclare : AbstractGameAction
 {
     public enum EngagementType
     {
@@ -185,8 +185,6 @@ public class EvadingDeclare : AbstractGameAction
 public class GameState
 {
     public List<Piece> pieces;
-    public int blueDamage;
-    public int redDamage;
     
     public Side currentSide;
     public Side turnInitialSide;
@@ -197,7 +195,7 @@ public class GameState
     // public Dictionary<Side, SideData> sideDataMap;
     public List<SideData> sideData;
 
-    public List<EngagmentDeclare.EngagementRecord> engagementDeclares = new();
+    public List<EngagementDeclare.EngagementRecord> engagementDeclares = new();
     // public List<int> engagementCarrierDeclares = new();
     public List<EvadingDeclare.EvadingRecord> evadingDeclares = new();
 
@@ -357,7 +355,7 @@ public class GameState
             var shooter = pieces[engageDec.shooterPieceId];
             var shooterHex = GetHex(shooter);
 
-            if(engageDec.type == EngagmentDeclare.EngagementType.Aircraft)
+            if(engageDec.type == EngagementDeclare.EngagementType.Aircraft)
             {
                 var target = pieces[engageDec.targetPieceId];
                 var targetHex = GetHex(target);
@@ -383,11 +381,11 @@ public class GameState
                     destroyedSet.Add(target);
                 }
             }
-            else if(engageDec.type == EngagmentDeclare.EngagementType.Carrier)
+            else if(engageDec.type == EngagementDeclare.EngagementType.Carrier)
             {
                 var anotherSide = GetAnotherSide(shooter.side);
                 var anotherSideData = GetSideData(anotherSide);
-                var targetHex = GetHex(anotherSideData.carrirCenter);
+                var targetHex = GetHex(anotherSideData.carrierCenter);
                 
                 var distance = shooterHex.Distance(targetHex);
 
@@ -408,7 +406,7 @@ public class GameState
 
                 if(hit)
                 {
-                    anotherSideData.carrirDamage += 1;
+                    anotherSideData.carrierDamage += 1;
                 }
             }
         }
@@ -418,7 +416,7 @@ public class GameState
         foreach(var side in GetSides())
         {
             var sideData = GetSideData(side);
-            fuelSourceMap[side] = new(){GetHex(sideData.carrirCenter)};
+            fuelSourceMap[side] = new(){GetHex(sideData.carrierCenter)};
         }
         foreach(var tanker in piecesOnMap.Where(p => p.isTanker))
         {
@@ -444,8 +442,8 @@ public class GameState
         }
 
         // Resolve Victory Status
-        var redCarrierDestroyed = GetSideData(Side.Red).carrirDamage >= 2;
-        var blueCarrierDestroyed = GetSideData(Side.Blue).carrirDamage >= 2;
+        var redCarrierDestroyed = GetSideData(Side.Red).carrierDamage >= 2;
+        var blueCarrierDestroyed = GetSideData(Side.Blue).carrierDamage >= 2;
         if(redCarrierDestroyed && blueCarrierDestroyed)
         {
             victoryStatus = VictoryStatus.Draw;
@@ -575,7 +573,7 @@ public class GameState
                     else if(piece.mapState == MapState.NotDeployed)
                     {
                         // (var x, var y) = currentSide == Side.Blue ? blueCarrierCenter : redCarrierCenter;
-                        var hex = GetHex(GetSideData(currentSide).carrirCenter);
+                        var hex = GetHex(GetSideData(currentSide).carrierCenter);
                         foreach(var p in hex.neighbors.Append(hex))
                         {
                             actions.Add(new DeployAction(){toX=p.x, toY=p.y, pieceId=piece.id});
@@ -603,7 +601,7 @@ public class GameState
                 };
 
                 var shooterHex = GetHex(shooter);
-                var anotherSideCarrierHex = GetHex(GetSideData(GetAnotherSide(shooter.side)).carrirCenter);
+                var anotherSideCarrierHex = GetHex(GetSideData(GetAnotherSide(shooter.side)).carrierCenter);
                 var carrierDistance = shooterHex.Distance(anotherSideCarrierHex);
                 if(carrierDistance <= shooter.antiShipRange && shooter.antiShipRating > 0)
                 {
@@ -626,17 +624,17 @@ public class GameState
             var combinedOptions = Utils.CartesianProduct(totalOptions);
             foreach(var combineOption in combinedOptions)
             {
-                var engaementRecords = combineOption.Where(o => o.type != ShootOption.Type.None).Select(o => new EngagmentDeclare.EngagementRecord(){
+                var engaementRecords = combineOption.Where(o => o.type != ShootOption.Type.None).Select(o => new EngagementDeclare.EngagementRecord(){
                     type = o.type switch
                     {
-                        ShootOption.Type.Aircraft => EngagmentDeclare.EngagementType.Aircraft,
-                        ShootOption.Type.Carrier => EngagmentDeclare.EngagementType.Carrier,
-                        _ => EngagmentDeclare.EngagementType.Aircraft // suppress compiler warning
+                        ShootOption.Type.Aircraft => EngagementDeclare.EngagementType.Aircraft,
+                        ShootOption.Type.Carrier => EngagementDeclare.EngagementType.Carrier,
+                        _ => EngagementDeclare.EngagementType.Aircraft // suppress compiler warning
                     },
                     shooterPieceId=o.shooter.id,
                     targetPieceId=o.target != null ? o.target.id : -1
                 }).ToList();
-                actions.Add(new EngagmentDeclare(){records=engaementRecords});
+                actions.Add(new EngagementDeclare(){records=engaementRecords});
             }
         }
         else if(currentPhase == Phase.EvadingDeclare)
@@ -710,13 +708,13 @@ public class GameState
         {
             new(){
                 side=Side.Blue,
-                carrirDamage=0,
-                carrirCenter=(0, 0),
+                carrierDamage=0,
+                carrierCenter=(0, 0),
                 regenerationCenter=(0, 0)},
             new(){
                 side=Side.Red,
-                carrirDamage=0,
-                carrirCenter=(5, 3),
+                carrierDamage=0,
+                carrierCenter=(5, 3),
                 regenerationCenter=(5, 3)
             },
         };
@@ -724,8 +722,6 @@ public class GameState
         return new()
         {
             pieces=pieces,
-            redDamage=0,
-            blueDamage=0,
             sideData=sideData
         };
     }

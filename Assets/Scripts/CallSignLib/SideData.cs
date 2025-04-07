@@ -4,8 +4,8 @@ namespace CallSignLib
 public class SideData
 {
     public Side side;
-    public int carrirDamage;
-    public (int, int) carrirCenter;
+    public int carrierDamage;
+    public (int, int) carrierCenter;
     public (int, int) regenerationCenter;
 }
 
