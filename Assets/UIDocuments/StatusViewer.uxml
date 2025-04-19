@@ -73,6 +73,7 @@
                         </Bindings>
                     </engine:DropdownField>
                     <engine:Button text="Export Current State" name="ExportCurrentStateButton" />
+                    <engine:Button text="Import State" name="ImportStateButton" />
                     <engine:Button text="WebGL Debug" name="WebGLDebugButton" />
                     <engine:VisualElement data-source-type="StatusViewer, Assembly-CSharp" name="ReplayDiv" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
                         <engine:Button text="Self-Play And Cache" name="SelfPlayAndCacheButton" />

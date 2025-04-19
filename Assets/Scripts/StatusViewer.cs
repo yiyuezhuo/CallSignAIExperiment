@@ -50,6 +50,9 @@ public class StatusViewer : MonoBehaviour
         var exportCurrentStateButton = root.Q<Button>("ExportCurrentStateButton");
         exportCurrentStateButton.clicked += OnExportCurrentStateButtonClicked;
 
+        var importStateButton = root.Q<Button>("ImportStateButton");
+        importStateButton.clicked += OnImportStateButtonClicked;
+
         var webglDebugButton = root.Q<Button>("WebGLDebugButton");
         webglDebugButton.clicked += () =>
         {
@@ -163,6 +166,24 @@ public class StatusViewer : MonoBehaviour
         Debug.Log("OnExportCurrentStateButtonClicked");
 
         UnityUtils.SaveTextFile(GameManager.Instance.gameState.ToXML(), "gameState", "xml");
+    }
+
+    void OnImportStateButtonClicked()
+    {
+        var gmr = IOManager.Instance;
+
+        gmr.textLoaded -= OnTextLoaded;
+        gmr.textLoaded += OnTextLoaded;
+
+        gmr.LoadTextFile("xml");
+    }
+
+    void OnTextLoaded(object sender, string s)
+    {
+        Debug.Log($"OnTextLoaded: s.Length={s.Length}");
+        
+        GameManager.Instance.gameState = GameState.FromXML(s);
+        GameManager.Instance.UpdateStackLocations();
     }
 
 
