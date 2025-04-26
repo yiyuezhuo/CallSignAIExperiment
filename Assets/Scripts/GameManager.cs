@@ -41,8 +41,10 @@ public class GameManager : MonoBehaviour
         new BaselineAgent(),
         new BaselineAgent2(),
         new BaselineAgent3(),
-        new BaselineAgent4()
+        new BaselineAgent4(),
     };
+
+    public NNBaseline1AgentScriptableObject nNBaseline1AgentScriptableObject;
 
     public enum StackType
     {
@@ -83,12 +85,12 @@ public class GameManager : MonoBehaviour
     public int currentEditEngagementId;
     public Side playingSide;
 
+    public EventHandler onAgentOptionsChanged;
+
     void Awake()
     {
         pieceLayer = LayerMask.GetMask("Piece"); // Can't be set in the declaration
         mapLayer = LayerMask.GetMask("Map");
-
-        currentAgent = agents[^1]; // Baseline Agent
 
         refAreaRecords = new()
         {
@@ -121,6 +123,13 @@ public class GameManager : MonoBehaviour
                 stackType = StackType.RedRegenerated
             }
         };
+
+        // Setup Sentis based agents
+        nNBaseline1AgentScriptableObject.agent.Setup();
+        agents.Add(nNBaseline1AgentScriptableObject.agent);
+        onAgentOptionsChanged?.Invoke(this, EventArgs.Empty);
+
+        currentAgent = agents[^1]; // Baseline Agent
     }
 
     // 

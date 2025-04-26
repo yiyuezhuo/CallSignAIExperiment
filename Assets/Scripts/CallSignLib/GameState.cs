@@ -114,7 +114,6 @@ public class NullAction : AbstractGameAction
     {
         return $"NullAction()";
     }
-
 }
 
 public class EngagementDeclare : AbstractGameAction

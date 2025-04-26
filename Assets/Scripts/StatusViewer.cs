@@ -17,6 +17,7 @@ public class StatusViewer : MonoBehaviour
     public string currentResult;
 
     public ReplayGenerator.SetupMode currentSetupMode;
+    public DropdownField agentDropdownField;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -120,7 +121,13 @@ public class StatusViewer : MonoBehaviour
             element.userData = index;
         };
 
-        var agentDropdownField = root.Q<DropdownField>("AgentDropdownField");
+        agentDropdownField = root.Q<DropdownField>("AgentDropdownField");
+        OnAgentsOptionsChanged(GameManager.Instance, EventArgs.Empty);
+        GameManager.Instance.onAgentOptionsChanged += OnAgentsOptionsChanged;
+    }
+
+    public void OnAgentsOptionsChanged(object sender, EventArgs e)
+    {
         agentDropdownField.choices = GameManager.Instance.agents.Select(a => a.GetName()).ToList();
     }
 

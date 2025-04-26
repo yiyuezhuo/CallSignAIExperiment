@@ -1483,8 +1483,6 @@ MonoBehaviour:
       isJammer: 1
       isC2: 0
       isTanker: 0
-    blueDamage: 0
-    redDamage: 0
     currentSide: 0
     turnInitialSide: 0
     currentPhase: 0
@@ -1519,6 +1517,7 @@ MonoBehaviour:
   piecePrefab: {fileID: 6160733504739974718, guid: 2ca0ae52e244d2949833e5b3429eef26, type: 3}
   damageTokenPrefab: {fileID: 6160733504739974718, guid: 240da142dee55b94491ee5421eae2246, type: 3}
   showLabels: 0
+  nNBaseline1AgentScriptableObject: {fileID: 11400000, guid: 2e445bfb950af2a46bfe94a6a14a9559, type: 2}
   state: 0
   pieceLayer:
     serializedVersion: 2
@@ -1724,6 +1723,50 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1651901245
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1651901247}
+  - component: {fileID: 1651901246}
+  m_Layer: 0
+  m_Name: IOManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1651901246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651901245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20516a9551890d44a606426baa8842e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1651901247
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651901245}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1769480194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1791,6 +1834,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTotal: 0
   currentCompleted: 0
+  currentResult: 
+  currentSetupMode: 0
 --- !u!114 &1769480198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2410,3 +2455,4 @@ SceneRoots:
   - {fileID: 367440174}
   - {fileID: 2040235687}
   - {fileID: 277188172}
+  - {fileID: 1651901247}

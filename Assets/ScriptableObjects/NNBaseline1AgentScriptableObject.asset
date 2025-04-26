@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e01c867a34b844f88297ecc97b9ace, type: 3}
+  m_Name: NNBaseline1AgentScriptableObject
+  m_EditorClassIdentifier: 
+  agent:
+    bundles:
+      actionType:
+        modelAsset: {fileID: 5022602860645237092, guid: 555fa163c345b614dacac132d60c75d3, type: 3}
+        rawResult:
+          actionTypeLogit: []
+      c2MoveAction:
+        modelAsset: {fileID: 5022602860645237092, guid: 495d0231799c552479762e7cc57de516, type: 3}
+        rawResult:
+          pieceIdC2Logit: []
+          pieceId1Logit: []
+          code1Logit: []
+          pieceId2Logit: []
+          code2Logit: []
+      deployAction:
+        modelAsset: {fileID: 5022602860645237092, guid: a3c118a111863414195e4cec46504347, type: 3}
+        rawResult:
+          pieceIdLogit: []
+          codeLogit: []
+      regenerateAction:
+        modelAsset: {fileID: 5022602860645237092, guid: 997564f6234614f41b6100829ccddeef, type: 3}
+        rawResult:
+          pieceIdLogit: []
+          codeLogit: []
+      moveAction:
+        modelAsset: {fileID: 5022602860645237092, guid: 7ba45cdaec104ea44b7893c59bdb9c06, type: 3}
+        rawResult:
+          pieceIdLogit: []
+          codeLogit: []
