@@ -90,6 +90,11 @@ public static class Utils
         }
         return rets;
     }
+
+    public static string ToStr(float[] arr)
+    {
+        return string.Join(" ", arr);
+    }
 }
 
 }

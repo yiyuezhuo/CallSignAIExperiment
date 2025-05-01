@@ -76,14 +76,24 @@ public interface IWorkerExtractable
     void Extract(Worker worker);
 }
 
+public interface IToActionable
+{
+    AbstractGameAction ToAction(GameState state);
+}
+
 [Serializable]
-public class C2MoveActionRawResult: IWorkerExtractable
+public class C2MoveActionRawResult: IWorkerExtractable, IToActionable
 {
     public float[] pieceIdC2Logit;
     public float[] pieceId1Logit;
     public float[] code1Logit;
     public float[] pieceId2Logit;
     public float[] code2Logit;
+
+    public override string ToString()
+    {
+        return $"C2MoveActionRawResult(pieceIdC2Logit={Utils.ToStr(pieceIdC2Logit)}, pieceId1Logit={Utils.ToStr(pieceId1Logit)}, code1Logit={Utils.ToStr(code1Logit)}, pieceId2Logit={Utils.ToStr(pieceId2Logit)}, code2Logit={Utils.ToStr(code2Logit)})";
+    }
 
     public void Extract(Worker worker)
     {
@@ -118,13 +128,20 @@ public class C2MoveActionRawResult: IWorkerExtractable
             toY2=toY2
         };
     }
+
+    AbstractGameAction IToActionable.ToAction(GameState state) => ToAction(state);
 }
 
 [Serializable]
-public class MLP2HeadRawResult: IWorkerExtractable
+public abstract class MLP2HeadRawResult
 {
     public float[] pieceIdLogit; 
     public float[] codeLogit;
+
+    public override string ToString()
+    {
+        return $"{GetType().Name}(pieceIdLogit={Utils.ToStr(pieceIdLogit)}, codeLogit={Utils.ToStr(codeLogit)})";
+    }
 
     public void Extract(Worker worker)
     {
@@ -132,7 +149,7 @@ public class MLP2HeadRawResult: IWorkerExtractable
         codeLogit = SentisUtils.GetFloatArray(worker, 1);
     }
 
-    public (int, int, int) _ToAction(GameState state)
+    public (int, int, int) ToActionRelativeToPiece(GameState state)
     {
         var pieceId = pieceIdLogit.ArgMax();
         var code = codeLogit.ArgMax();
@@ -142,14 +159,28 @@ public class MLP2HeadRawResult: IWorkerExtractable
 
         return (pieceId, toX, toY);
     }
+
+    public (int, int, int) ToActionRelativeToCarrier(GameState state)
+    {
+        var pieceId = pieceIdLogit.ArgMax();
+        var code = codeLogit.ArgMax();
+
+        var piece = state.pieces[pieceId];
+        var sideData = state.sideData.First(s => s.side == piece.side);
+        (var toX, var toY) = SentisUtils.DecodeToXY(code, sideData.carrierCenter.Item1, sideData.carrierCenter.Item2);
+
+        return (pieceId, toX, toY);
+    }
+
+    // public abstract AbstractGameAction ToAction(GameState state);
 }
 
 [Serializable]
-public class DeployActionRawResult: MLP2HeadRawResult
+public class DeployActionRawResult: MLP2HeadRawResult, IWorkerExtractable, IToActionable
 {
     public DeployAction ToAction(GameState state)
     {
-        (var pieceId, var toX, var toY) = _ToAction(state);
+        (var pieceId, var toX, var toY) = ToActionRelativeToCarrier(state);
         return new()
         {
             pieceId=pieceId,
@@ -157,14 +188,16 @@ public class DeployActionRawResult: MLP2HeadRawResult
             toY=toY
         };
     }
+
+    AbstractGameAction IToActionable.ToAction(GameState state) => ToAction(state);
 }
 
 [Serializable]
-public class RegenerateActionRawResult: MLP2HeadRawResult
+public class RegenerateActionRawResult: MLP2HeadRawResult, IWorkerExtractable, IToActionable
 {
     public RegenerateAction ToAction(GameState state)
     {
-        (var pieceId, var toX, var toY) = _ToAction(state);
+        (var pieceId, var toX, var toY) = ToActionRelativeToCarrier(state);
         return new()
         {
             pieceId=pieceId,
@@ -172,14 +205,16 @@ public class RegenerateActionRawResult: MLP2HeadRawResult
             toY=toY
         };
     }
+
+    AbstractGameAction IToActionable.ToAction(GameState state) => ToAction(state);
 }
 
 [Serializable]
-public class MoveActionRawResult: MLP2HeadRawResult
+public class MoveActionRawResult: MLP2HeadRawResult, IWorkerExtractable, IToActionable
 {
     public MoveAction ToAction(GameState state)
     {
-        (var pieceId, var toX, var toY) = _ToAction(state);
+        (var pieceId, var toX, var toY) = ToActionRelativeToPiece(state);
         return new()
         {
             pieceId=pieceId,
@@ -187,17 +222,33 @@ public class MoveActionRawResult: MLP2HeadRawResult
             toY=toY
         };
     }
+
+    AbstractGameAction IToActionable.ToAction(GameState state) => ToAction(state);
 }
 
 [Serializable]
 public class ActionTypeRawResult: IWorkerExtractable
 {
-    public float[] actionTypeLogit; 
+    public float[] actionTypeLogit;
+    public override string ToString()
+    {
+        return $"ActionTypeRawResult(actionTypeLogit={Utils.ToStr(actionTypeLogit)})";
+    }
 
     public void Extract(Worker worker)
     {
         actionTypeLogit = SentisUtils.GetFloatArray(worker, 0);
     }
+}
+
+[Serializable]
+public class NullActionRawResult: IWorkerExtractable, IToActionable
+{
+    public void Extract(Worker worker)
+    {
+    }
+
+    AbstractGameAction IToActionable.ToAction(GameState state) => new NullAction();
 }
 
 [Serializable]
@@ -239,7 +290,8 @@ public class NNBaseline1Agent: AbstractAgent
 
             // var runtimeModel = graph.Compile(softmax);
 
-            worker = new Worker(runtimeModel, BackendType.GPUCompute); // switch to cpu?
+            // worker = new Worker(runtimeModel, BackendType.GPUCompute); // switch to cpu?
+            worker = new Worker(runtimeModel, BackendType.CPU);
         }
 
         public void Calculate(Tensor input)
@@ -319,8 +371,8 @@ public class NNBaseline1Agent: AbstractAgent
     {
         return new float[]
         {
-            piece.mapState == MapState.Destroyed ? 1f : 0,
             piece.mapState == MapState.NotDeployed ? 1f : 0,
+            piece.mapState == MapState.Destroyed ? 1f : 0,
             piece.x / 5,
             piece.y / 4
         };
@@ -371,17 +423,33 @@ public class NNBaseline1Agent: AbstractAgent
         bundles.SetInput(stateEncoded);
         bundles.Calculate();
         var actionTypeLogit = bundles.actionType.rawResult.actionTypeLogit;
+
+        Debug.Log(bundles.actionType.rawResult);
+
         var actionTypeIdx = actionTypeLogit.ArgMax();
-        AbstractGameAction ret = actionTypeIdx switch
+        // AbstractGameAction ret = actionTypeIdx switch
+        // {
+        //     0 => bundles.deployAction.rawResult.ToAction(state),
+        //     1 => null, // Engagement phase is not modeled in NNBaseline1
+        //     2 => bundles.c2MoveAction.rawResult.ToAction(state),
+        //     3 => bundles.regenerateAction.rawResult.ToAction(state),
+        //     4 => bundles.moveAction.rawResult.ToAction(state),
+        //     5 => new NullAction(),
+        //     _ => null
+        // };
+        IToActionable rawResult = actionTypeIdx switch
         {
-            0 => bundles.deployAction.rawResult.ToAction(state),
+            0 => bundles.deployAction.rawResult,
             1 => null, // Engagement phase is not modeled in NNBaseline1
-            2 => bundles.c2MoveAction.rawResult.ToAction(state),
-            3 => bundles.regenerateAction.rawResult.ToAction(state),
-            4 => bundles.moveAction.rawResult.ToAction(state),
-            5 => new NullAction(),
+            2 => bundles.c2MoveAction.rawResult,
+            3 => bundles.regenerateAction.rawResult,
+            4 => bundles.moveAction.rawResult,
+            5 => new NullActionRawResult(),
             _ => null
         };
+
+        Debug.Log($"rawResult={rawResult}");
+        var ret = rawResult.ToAction(state);
 
         return ret;
     }
