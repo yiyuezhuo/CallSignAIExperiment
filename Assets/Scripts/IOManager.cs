@@ -6,7 +6,12 @@ using System;
 using System.Collections;
 using UnityEngine.Networking;
 
-public class IOManager: SingletonMonoBehaviour<IOManager>
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
+
+
+public class IOManager : SingletonMonoBehaviour<IOManager>
 {
     public event EventHandler<string> textLoaded;
 
@@ -53,7 +58,7 @@ public class IOManager: SingletonMonoBehaviour<IOManager>
     }
 #endif
 
-    public void SaveTextFile(string _data, string name="sample", string ext="txt")
+    public void SaveTextFile(string _data, string name = "sample", string ext = "txt")
     {
         Debug.Log("SaveTextFile");
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -63,21 +68,23 @@ public class IOManager: SingletonMonoBehaviour<IOManager>
 #else
 
         var path = SFB.StandaloneFileBrowser.SaveFilePanel("Title", "", name, ext);
-        if (!string.IsNullOrEmpty(path)) {
+        if (!string.IsNullOrEmpty(path))
+        {
             System.IO.File.WriteAllText(path, _data);
         }
 
 #endif
     }
 
-    public void LoadTextFile(string ext="txt")
+    public void LoadTextFile(string ext = "txt")
     {
         Debug.Log("LoadTextFile");
 #if UNITY_WEBGL && !UNITY_EDITOR
         UploadFile(gameObject.name, "OnFileUpload", $".{ext}", false);
 #else
         var paths = StandaloneFileBrowser.OpenFilePanel("Title", "", ext, false);
-        if (paths.Length > 0) {
+        if (paths.Length > 0)
+        {
             StartCoroutine(OutputRoutine(new System.Uri(paths[0]).AbsoluteUri));
         }
 #endif

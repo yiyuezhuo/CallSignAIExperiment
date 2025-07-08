@@ -129,7 +129,8 @@ public class GameManager : MonoBehaviour
         agents.Add(nNBaseline1AgentScriptableObject.agent);
         onAgentOptionsChanged?.Invoke(this, EventArgs.Empty);
 
-        currentAgent = agents[^1]; // Baseline Agent
+        // currentAgent = agents[^1]; // NN Baseline Agent
+        currentAgent = agents[^2]; // Last Search based Baseline Agent
     }
 
     // 

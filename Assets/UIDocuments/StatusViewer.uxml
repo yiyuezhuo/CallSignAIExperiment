@@ -4,7 +4,7 @@
     <Style src="project://database/Assets/UIDocuments/style.uss?fileID=7433441132597879392&amp;guid=6422005a05230b54e8d612fd23d7f712&amp;type=3#style" />
     <engine:VisualElement data-source-type="GameManager, Assembly-CSharp" style="flex-grow: 0; background-color: rgba(255, 255, 255, 0.2); flex-direction: column; right: 200px; left: 0; position: absolute; border-right-width: 5px; margin-right: 2px; flex-wrap: wrap;">
         <engine:TabView>
-            <engine:Tab label="General">
+            <engine:Tab label="State">
                 <engine:VisualElement style="flex-grow: 1; flex-wrap: wrap;">
                     <engine:VisualElement class="compact" style="flex-grow: 0; flex-direction: row; flex-wrap: wrap;">
                         <engine:Label text="Phase:" />
@@ -56,7 +56,7 @@
                     </engine:VisualElement>
                 </engine:VisualElement>
             </engine:Tab>
-            <engine:Tab label="Debug">
+            <engine:Tab label="Misc">
                 <engine:VisualElement style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
                     <engine:Button text="Show Current Action" name="ShowCurrentActionButton" />
                     <engine:Button text="Show Current State" name="ShowCurrentStateButton" />
@@ -75,32 +75,34 @@
                     <engine:Button text="Export Current State" name="ExportCurrentStateButton" />
                     <engine:Button text="Import State" name="ImportStateButton" />
                     <engine:Button text="WebGL Debug" name="WebGLDebugButton" />
-                    <engine:VisualElement data-source-type="StatusViewer, Assembly-CSharp" name="ReplayDiv" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
-                        <engine:Button text="Self-Play And Cache" name="SelfPlayAndCacheButton" />
-                        <engine:Label text="Samples:" />
-                        <engine:FloatField>
-                            <Bindings>
-                                <engine:DataBinding property="value" data-source-path="currentTotal" binding-mode="TwoWay" />
-                            </Bindings>
-                        </engine:FloatField>
-                        <engine:EnumField value="Center" type="CallSignLib.ReplayGenerator+SetupMode, Assembly-CSharp">
-                            <Bindings>
-                                <engine:DataBinding property="value" data-source-path="currentSetupMode" binding-mode="TwoWay" />
-                            </Bindings>
-                        </engine:EnumField>
-                        <engine:ProgressBar title="replay progress" name="SelfReplayProgressBar">
-                            <Bindings>
-                                <engine:DataBinding property="highValue" data-source-path="currentTotal" binding-mode="ToTarget" />
-                                <engine:DataBinding property="value" data-source-path="currentCompleted" binding-mode="ToTarget" />
-                                <engine:DataBinding property="title" binding-mode="ToTarget" source-to-ui-converters="StatusViewer =&gt; string (progress)" />
-                            </Bindings>
-                        </engine:ProgressBar>
-                        <engine:Button text="Export Replay" name="ExportReplayButton">
-                            <Bindings>
-                                <engine:DataBinding property="enabledSelf" data-source-path="currentResult" binding-mode="ToTarget" source-to-ui-converters="string =&gt; bool" />
-                            </Bindings>
-                        </engine:Button>
-                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:Tab>
+            <engine:Tab label="Replay">
+                <engine:VisualElement data-source-type="StatusViewer, Assembly-CSharp" name="ReplayDiv" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
+                    <engine:Button text="Self-Play And Cache" name="SelfPlayAndCacheButton" />
+                    <engine:Label text="Samples:" />
+                    <engine:FloatField>
+                        <Bindings>
+                            <engine:DataBinding property="value" data-source-path="currentTotal" binding-mode="TwoWay" />
+                        </Bindings>
+                    </engine:FloatField>
+                    <engine:EnumField value="Center" type="CallSignLib.ReplayGenerator+SetupMode, Assembly-CSharp">
+                        <Bindings>
+                            <engine:DataBinding property="value" data-source-path="currentSetupMode" binding-mode="TwoWay" />
+                        </Bindings>
+                    </engine:EnumField>
+                    <engine:ProgressBar title="replay progress" name="SelfReplayProgressBar">
+                        <Bindings>
+                            <engine:DataBinding property="highValue" data-source-path="currentTotal" binding-mode="ToTarget" />
+                            <engine:DataBinding property="value" data-source-path="currentCompleted" binding-mode="ToTarget" />
+                            <engine:DataBinding property="title" binding-mode="ToTarget" source-to-ui-converters="StatusViewer =&gt; string (progress)" />
+                        </Bindings>
+                    </engine:ProgressBar>
+                    <engine:Button text="Export Replay" name="ExportReplayButton">
+                        <Bindings>
+                            <engine:DataBinding property="enabledSelf" data-source-path="currentResult" binding-mode="ToTarget" source-to-ui-converters="string =&gt; bool" />
+                        </Bindings>
+                    </engine:Button>
                 </engine:VisualElement>
             </engine:Tab>
         </engine:TabView>
