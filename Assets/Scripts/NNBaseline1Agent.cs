@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CallSignLib;
+using Unity.VisualScripting;
 
 public static class SentisUtils
 {
@@ -22,7 +23,8 @@ public static class SentisUtils
     public static float[] GetFloatArray(Worker worker, int i)
     {
         // return (worker.PeekOutput(i) as Tensor<float>).DownloadToArray();
-        return (worker.PeekOutput(i) as Tensor<float>).ReadbackAndClone().DownloadToArray();
+        // return (worker.PeekOutput(i) as Tensor<float>).ReadbackAndClone().DownloadToArray();
+        return (worker.PeekOutput(i) as Tensor<float>).DownloadToArray();
     }
 
     public static float[] Softmax(float[] input)
@@ -290,8 +292,8 @@ public class NNBaseline1Agent: AbstractAgent
 
             // var runtimeModel = graph.Compile(softmax);
 
-            // worker = new Worker(runtimeModel, BackendType.GPUCompute); // switch to cpu?
-            worker = new Worker(runtimeModel, BackendType.CPU);
+            worker = new Worker(runtimeModel, BackendType.GPUCompute); // switch to cpu?
+            // worker = new Worker(runtimeModel, BackendType.CPU);
         }
 
         public void Calculate(Tensor input)
@@ -331,8 +333,13 @@ public class NNBaseline1Agent: AbstractAgent
 
         public void SetInput(float[] _input)
         {
+            input?.Dispose();
+
+            input = new Tensor<float>(new TensorShape(1, _input.Length));
+
             for(var i=0; i<_input.Length; i++)
                 input[0, i] = _input[i];
+            // input.Upload(_input); // will freeze for some reason
         }
 
         public void Setup()
@@ -449,8 +456,15 @@ public class NNBaseline1Agent: AbstractAgent
         };
 
         Debug.Log($"rawResult={rawResult}");
-        var ret = rawResult.ToAction(state);
+        var actionProposed = rawResult.ToAction(state);
+        var retAction = actionProposed;
 
-        return ret;
+        if(!actionProposed.IsValid(state))
+        {
+            Debug.LogWarning($"Invalid action proposed: fallback to null action: {actionProposed}");
+            retAction = new NullAction();
+        }
+
+        return retAction;
     }
 }

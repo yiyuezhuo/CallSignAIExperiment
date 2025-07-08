@@ -16,7 +16,7 @@ public enum MapState
     Destroyed
 }
 
-[Serializable]
+// [Serializable]
 public class Piece
 {
     public int id;
@@ -90,6 +90,7 @@ public class Piece
             side = side,
             isC2=true,
             fuelRange = 2,
+            specialRange = 2,
         };
     }
 

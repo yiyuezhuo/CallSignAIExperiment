@@ -1,21 +1,36 @@
 using System.IO;
 using System.Text;
-using System.Runtime.InteropServices;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using SFB;
 using System;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class IOManager: MonoBehaviour
+public class IOManager: SingletonMonoBehaviour<IOManager>
 {
     public event EventHandler<string> textLoaded;
 
-    private IEnumerator OutputRoutine(string url) {
-        var loader = new WWW(url); // TODO: Use UnityWebRequest
-        yield return loader;
-        textLoaded?.Invoke(null, loader.text);
+    private IEnumerator OutputRoutine(string url)
+    {
+        Debug.Log($"OutputRoutine({url})");
+        // var loader = new WWW(url); // TODO: Use UnityWebRequest
+        // yield return loader;
+        // textLoaded?.Invoke(null, loader.text);
+
+        using (var webRequest = UnityWebRequest.Get(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                textLoaded?.Invoke(null, webRequest.downloadHandler.text);
+            }
+            else
+            {
+                Debug.LogError("UnityWebRequest failed to get");
+                textLoaded?.Invoke(null, null);
+            }
+        }
     }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -33,16 +48,17 @@ public class IOManager: MonoBehaviour
     }
 
     public void OnFileUpload(string url) {
+        Debug.Log($"OnFileUpload({url})");
         StartCoroutine(OutputRoutine(url));
     }
 #endif
 
     public void SaveTextFile(string _data, string name="sample", string ext="txt")
     {
+        Debug.Log("SaveTextFile");
 #if UNITY_WEBGL && !UNITY_EDITOR
-
         var bytes = System.Text.Encoding.UTF8.GetBytes(_data);
-        DownloadFile("gameObject.name", "OnFileDownload", $"{name}.{ext}", bytes, bytes.Length);
+        DownloadFile(gameObject.name, "OnFileDownload", $"{name}.{ext}", bytes, bytes.Length);
 
 #else
 
@@ -56,6 +72,7 @@ public class IOManager: MonoBehaviour
 
     public void LoadTextFile(string ext="txt")
     {
+        Debug.Log("LoadTextFile");
 #if UNITY_WEBGL && !UNITY_EDITOR
         UploadFile(gameObject.name, "OnFileUpload", $".{ext}", false);
 #else
@@ -64,23 +81,5 @@ public class IOManager: MonoBehaviour
             StartCoroutine(OutputRoutine(new System.Uri(paths[0]).AbsoluteUri));
         }
 #endif
-    }
-
-    static IOManager _instance;
-    public static IOManager Instance
-    {
-        get 
-        {
-            if(_instance == null)
-            {
-                _instance = FindFirstObjectByType<IOManager>();
-            }
-            return _instance;
-        }
-    }
-    public void OnDestroy()
-    {
-        Debug.Log("OnDestroy");
-        _instance = null;
     }
 }

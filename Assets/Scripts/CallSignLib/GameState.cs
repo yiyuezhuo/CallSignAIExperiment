@@ -12,6 +12,7 @@ namespace CallSignLib
 public abstract class AbstractGameAction
 {
     public abstract void Execute(GameState state);
+    public abstract bool IsValid(GameState state);
 }
 
 public class MoveAction : AbstractGameAction
@@ -25,6 +26,16 @@ public class MoveAction : AbstractGameAction
         var piece = state.pieces.Find(x => x.id == pieceId);
         piece.x = toX;
         piece.y = toY;
+    }
+
+    public override bool IsValid(GameState state)
+    {
+        var piece = state.pieces.Find(x => x.id == pieceId);
+        if(piece.mapState != MapState.OnMap)
+            return false;
+
+        var hex = GameState.grid.hexMap[(piece.x, piece.y)];
+        return hex.neighbors.FirstOrDefault(nei => nei.x == toX && nei.y == toY) != null;
     }
 
     public override string ToString()
@@ -43,6 +54,29 @@ public class C2MoveAction : AbstractGameAction
     public int toX2;
     public int toY2;
 
+    public override bool IsValid(GameState state)
+    {
+        var c2Piece = state.pieces.Find(x => x.id == pieceidC2);
+        var piece1 = state.pieces.Find(x => x.id == pieceId1);
+        var piece2 = state.pieces.Find(x => x.id == pieceId2);
+
+        if(c2Piece.mapState != MapState.OnMap || piece1.mapState != MapState.OnMap || piece2.mapState != MapState.OnMap || !c2Piece.isC2)
+            return false;
+
+        var c2PieceNodeIdx = GameState.grid.xyToSimpleIdx[(c2Piece.x, c2Piece.y)];
+        var c2PieceDistanceField = GameState.grid.simpleGraph.GetDistanceField(c2PieceNodeIdx);
+        if(c2PieceDistanceField[GameState.grid.xyToSimpleIdx[(piece1.x, piece1.y)]] > c2Piece.specialRange ||
+            c2PieceDistanceField[GameState.grid.xyToSimpleIdx[(piece2.x, piece2.y)]] > c2Piece.specialRange)
+        {
+            return false;
+        }
+
+        var isPiece1Nei = GameState.grid.hexMap[(piece1.x, piece1.y)].neighbors.FirstOrDefault(nei => nei.x == toX1 && nei.y == toY1) != null;
+        var isPiece2Nei = GameState.grid.hexMap[(piece2.x, piece2.y)].neighbors.FirstOrDefault(nei => nei.x == toX2 && nei.y == toY2) != null;
+
+        return isPiece1Nei && isPiece2Nei;
+    }
+
     public override void Execute(GameState state)
     {
         var piece1 = state.pieces.Find(x => x.id == pieceId1);
@@ -59,7 +93,6 @@ public class C2MoveAction : AbstractGameAction
     {
         return $"C2MoveAction({pieceidC2}, {pieceId1}, {toX1}, {toY1}, {pieceId2}, {toX2}, {toY2})";
     }
-
 }
 
 public class DeployAction : AbstractGameAction
@@ -67,6 +100,20 @@ public class DeployAction : AbstractGameAction
     public int pieceId;
     public int toX;
     public int toY;
+
+    public override bool IsValid(GameState state)
+    {
+        var piece = state.pieces.Find(x => x.id == pieceId);
+        if(piece.mapState != MapState.NotDeployed)
+            return false;
+        
+        var carrierNodeIdx = GameState.grid.xyToSimpleIdx[
+            state.sideData.Find(s => s.side == state.currentSide).carrierCenter
+        ];
+        var carrierDistanceField = GameState.grid.simpleGraph.GetDistanceField(carrierNodeIdx);
+        var dist = carrierDistanceField[GameState.grid.xyToSimpleIdx[(toX, toY)]];
+        return dist <= 1;
+    }
 
     public override void Execute(GameState state)
     {
@@ -89,6 +136,20 @@ public class RegenerateAction : AbstractGameAction
     public int toX;
     public int toY;
 
+    public override bool IsValid(GameState state)
+    {
+        var piece = state.pieces.Find(x => x.id == pieceId);
+        if(piece.mapState != MapState.Destroyed)
+            return false;
+        
+        var carrierNodeIdx = GameState.grid.xyToSimpleIdx[
+            state.sideData.Find(s => s.side == state.currentSide).carrierCenter
+        ];
+        var carrierDistanceField = GameState.grid.simpleGraph.GetDistanceField(carrierNodeIdx);
+        var dist = carrierDistanceField[GameState.grid.xyToSimpleIdx[(toX, toY)]];
+        return dist <= 1;
+    }
+
     public override void Execute(GameState state)
     {
         var piece = state.pieces.Find(x => x.id == pieceId);
@@ -109,6 +170,8 @@ public class NullAction : AbstractGameAction
     public override void Execute(GameState state)
     {
     }
+
+    public override bool IsValid(GameState state) => true;
 
     public override string ToString()
     {
@@ -139,6 +202,11 @@ public class EngagementDeclare : AbstractGameAction
 
     public List<EngagementRecord> records = new();
 
+    public override bool IsValid(GameState state)
+    {
+        return true; // TODO: Not modeled at this point
+    }
+
     public override void Execute(GameState state)
     {
         state.engagementDeclares.AddRange(records);
@@ -167,6 +235,11 @@ public class EvadingDeclare : AbstractGameAction
     }
 
     public List<EvadingRecord> records = new();
+
+    public override bool IsValid(GameState state)
+    {
+        return true; // TODO: Not modeled at this point
+    }
 
     public override void Execute(GameState state)
     {

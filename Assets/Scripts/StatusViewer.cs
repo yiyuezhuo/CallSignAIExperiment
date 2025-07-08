@@ -75,9 +75,10 @@ public class StatusViewer : MonoBehaviour
         exportReplayButton.clicked += () =>
         {
             Debug.Log("exportReplayButton.clicked");
-            if(currentResult != null)
+            if (currentResult != null)
             {
-                UnityUtils.SaveTextFile(currentResult, "replay", "xml");
+                // UnityUtils.SaveTextFile(currentResult, "replay", "xml");
+                IOManager.Instance.SaveTextFile(currentResult, "replay", "xml");
             }
         };
         // exportReplayButton.dataSource = this;
@@ -172,7 +173,8 @@ public class StatusViewer : MonoBehaviour
     {
         Debug.Log("OnExportCurrentStateButtonClicked");
 
-        UnityUtils.SaveTextFile(GameManager.Instance.gameState.ToXML(), "gameState", "xml");
+        // UnityUtils.SaveTextFile(GameManager.Instance.gameState.ToXML(), "gameState", "xml");
+        IOManager.Instance.SaveTextFile(GameManager.Instance.gameState.ToXML(), "gameState", "xml");
     }
 
     void OnImportStateButtonClicked()
@@ -283,18 +285,19 @@ public class StatusViewer : MonoBehaviour
     public void CurrentAgentRunGameState()
     {
         var gmr = GameManager.Instance;
+        
+        // Temp hack for debug score
+        // if(gmr.currentAgent is StateScoreBasedAgent socredAgent)
+        // {
+        //     var action = socredAgent.Policy(gmr.gameState);
+        //     var prevScore = socredAgent.EstimateState(gmr.gameState);
 
-        if(gmr.currentAgent is StateScoreBasedAgent socredAgent)
-        {
-            var action = socredAgent.Policy(gmr.gameState);
-            var prevScore = socredAgent.EstimateState(gmr.gameState);
+        //     var newState = gmr.gameState.Clone();
+        //     action.Execute(newState);
+        //     var newScore = socredAgent.EstimateState(newState);
 
-            var newState = gmr.gameState.Clone();
-            action.Execute(newState);
-            var newScore = socredAgent.EstimateState(newState);
-
-            Debug.LogWarning($"Score: {prevScore} => {newScore} ({action})");
-        }
+        //     Debug.LogWarning($"Score: {prevScore} => {newScore} ({action})");
+        // }
         
         gmr.currentAgent.Run(gmr.gameState);
     }
